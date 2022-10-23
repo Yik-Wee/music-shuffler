@@ -6,6 +6,9 @@ class Result:
         self.ok = ok
         self.value = value
 
+    def err(self) -> Any:
+        return None
+
     def __repr__(self) -> str:
         return f'Result(ok={self.ok}, value={self.value})'
 
@@ -21,6 +24,9 @@ class Ok(Result):
 class Err(Result):
     def __init__(self, error: Union[Exception, str]):
         super().__init__(ok=False, value=error)
+
+    def err(self) -> Any:
+        return self.value
 
     def __repr__(self) -> str:
         return f'Err({self.value})'

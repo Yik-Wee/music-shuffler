@@ -3,12 +3,11 @@ CREATE TABLE IF NOT EXISTS Platform (
     PRIMARY KEY (PlatformID)
 );
 
-INSERT INTO Platform (PlatformID)
+INSERT OR IGNORE INTO Platform (PlatformID)
 VALUES
     ('YOUTUBE'),
     ('SOUNDCLOUD'),
-    ('SPOTIFY')
-;
+    ('SPOTIFY');
 
 CREATE TABLE IF NOT EXISTS Playlist (
     PlaylistID TEXT,

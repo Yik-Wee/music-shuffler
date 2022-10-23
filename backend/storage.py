@@ -377,8 +377,22 @@ class PlaylistTracksCollection(Collection):
             return Err('Invalid filter (record). Too many keys')
 
         result = self.try_execute('''
-            SELECT * FROM PlaylistTracks
-            WHERE PlaylistID = ? AND Platform = ?;
+            SELECT
+                PlaylistTracks.Position,
+                Playlist.PlaylistID, Playlist.Platform, Playlist.Title, Playlist.Owner, Playlist.Description,
+                Playlist.Thumbnail, Playlist.Length, Playlist.Etag,
+                Track.TrackID, Track.Platform, Track.Title, Track.Owner, Track.Thumbnail, Track.DurationSeconds
+            FROM PlaylistTracks
+            INNER JOIN Playlist
+            ON
+                Playlist.PlaylistID = PlaylistTracks.PlaylistID
+                AND Playlist.Platform = PlaylistTracks.Platform
+            INNER JOIN Track
+            ON
+                Track.TrackID = PlaylistTracks.Position
+                AND Track.Platform = PlaylistTracks.Platform
+            WHERE Playlist.PlaylistID = ? AND Playlist.Platform = ?
+            ORDER BY Position ASC;
         ''', (playlist_id, platform), commit=False, cursor_callback=lambda cur: cur.fetchall())
         return result
 

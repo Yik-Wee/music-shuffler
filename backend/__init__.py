@@ -1,11 +1,6 @@
-# import os as __os
 import sqlite3
+from typing import TypedDict
 from .storage import *
-
-
-# BACKEND_FOLDER = __os.path.dirname(__os.path.realpath(__file__))
-# DB_PATH = __os.path.join(BACKEND_FOLDER, 'music_cache.db')
-# SCHEMA_PATH = __os.path.join(BACKEND_FOLDER, 'schema.sql')
 
 
 class __DbInitialiser:
@@ -26,3 +21,16 @@ class __DbInitialiser:
 def create_database(db_path: str = DB_PATH):
     '''Creates the database `db_path` with tables from `schema.sql` if they don't already exist'''
     __DbInitialiser.create_database(db_path)
+
+
+class CollectionDict(TypedDict):
+    Playlist: PlaylistCollection
+    PlaylistTracks: PlaylistTracksCollection
+    Track: TrackCollection
+
+
+colls: CollectionDict = {
+    'Playlist': PlaylistCollection(),
+    'PlaylistTracks': PlaylistTracksCollection(),
+    'Track': TrackCollection(),
+}
