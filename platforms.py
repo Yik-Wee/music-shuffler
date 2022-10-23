@@ -16,10 +16,11 @@ dotenv.load_dotenv('.env')
 _YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')
 
 platform_apis: Dict[str, PlatformApi] = {
-    'youtube': YouTubeApi(api_key=_YOUTUBE_API_KEY),
-    'spotify': SpotifyApi(),
-    'soundcloud': SoundCloudApi()
+    'YOUTUBE': YouTubeApi(api_key=_YOUTUBE_API_KEY),
+    'SPOTIFY': SpotifyApi(),
+    'SOUNDCLOUD': SoundCloudApi()
 }
 
-ALL_PLATFORMS = list(platform_apis.keys())
+# ALL_PLATFORMS = list(map(platform_apis.keys(), lambda x: x.lower()))
+ALL_PLATFORMS = ('youtube', 'spotify', 'soundcloud')
 '''The list of all supported music platforms, obtained from `platform_apis.keys()`'''

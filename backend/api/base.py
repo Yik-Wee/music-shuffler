@@ -2,6 +2,18 @@ from typing import List, TypedDict, Union
 
 
 class Track(TypedDict):
+    '''
+    ```
+    {
+        'track_id': str,
+        'platform': str,
+        'title': str,
+        'owner': str,
+        'thumbnail': str,
+        'duration_seconds': int,
+    }
+    ```
+    '''
     track_id: str
     platform: str
     title: str
@@ -11,6 +23,21 @@ class Track(TypedDict):
 
 
 class Playlist(TypedDict):
+    '''
+    ```
+    {
+        'platform': str,
+        'playlist_id': str,
+        'title': str,
+        'owner': str,
+        'description': str,
+        'thumbnail': str,
+        'length': str,
+        'etag': str,
+        'tracks': List[Track],
+    }
+    ```
+    '''
     platform: str
     playlist_id: str
     title: str

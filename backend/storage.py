@@ -25,6 +25,12 @@ class Column:
         self.default = default
         self.is_required = is_required
 
+    def __repr__(self) -> str:
+        return f'Column({self.column_name}, default={self.default}, is_required={self.is_required})'
+
+    def __str__(self) -> str:
+        return self.column_name
+
 
 class Collection:
     '''
@@ -55,7 +61,7 @@ class Collection:
           - `True` if record is valid, `False` otherwise
         '''
 
-        # valid_column_count = 0
+        valid_column_count = 0
 
         for column in cls.columns:
             # populate the record with the missing columns
@@ -64,12 +70,14 @@ class Collection:
                 # populated with the default (empty) value
                 if not column.is_required:
                     record[column.column_name] = column.default
-                    # valid_column_count += 1
+                    valid_column_count += 1
                 else:
                     return Err(f'Invalid record. key `{column}` is required')
+            else:
+                valid_column_count += 1
 
-        # if valid_column_count < len(record):
-        #     return Err('Invalid record. Too many columns')
+        if valid_column_count < len(record):
+            return Err('Invalid record. Too many columns')
         return Ok(True)
 
     def try_execute(
@@ -145,6 +153,19 @@ class PlaylistCollection(Collection):
     ]
 
     def insert(self, record: dict) -> Result:
+        '''
+        Params
+        ------
+        `record`
+        - The record to insert. Must have exactly the `columns`:
+            - PlaylistID, Title, Owner, Description, Thumbnail, Length, Etag, Platform
+
+        Returns
+        ------
+        - `Err(validation_err_msg)` if record is invalid
+        - `Err(sqlite3.Error)` if record insertion fails
+        - `Ok(None)` if insertion is successful
+        '''
         # validate record
         validation_result = self.validate(record)
         if not validation_result.ok:
@@ -170,7 +191,7 @@ class PlaylistCollection(Collection):
             result = self.try_execute('DELETE FROM Playlist;', ())
             return result
 
-        playlist_id = record.get('PlaylistId')
+        playlist_id = record.get('PlaylistID')
         platform = record.get('Platform')
         if playlist_id is None or platform is None:
             return Err('Invalid filter (record). Both PlaylistID and Platform columns are required')
@@ -217,7 +238,7 @@ class PlaylistCollection(Collection):
 
 class TrackCollection(Collection):
     '''
-    Interface for the Track table.    
+    Interface for the Track table.
     '''
 
     columns = [
@@ -230,13 +251,27 @@ class TrackCollection(Collection):
     ]
 
     def insert(self, record: dict) -> Result:
+        '''
+        Params
+        ------
+        `record`
+        - The record to insert. Performs INSERT OR IGNORE INTO Track ... insertion.
+          must have the exact `columns`:
+            - TrackID, Platform, Title, Owner, Thumbnail, DurationSeconds
+
+        Returns
+        ------
+        - `Err(validation_err_msg)` if record is invalid
+        - `Err(sqlite3.Error)` if record insertion fails
+        - `Ok(None)` if insertion is successful
+        '''
         # validate record
         validation_result = self.validate(record)
         if not validation_result.ok:
             return validation_result
 
         result = self.try_execute('''
-            INSERT INTO Track (TrackID, Platform, Title, Owner, Thumbnail, DurationSeconds)
+            INSERT OR IGNORE INTO Track (TrackID, Platform, Title, Owner, Thumbnail, DurationSeconds)
             VALUES (:TrackID, :Platform, :Title, :Owner, :Thumbnail, :DurationSeconds)
         ''', record)
         return result
@@ -313,6 +348,13 @@ class PlaylistTracksCollection(Collection):
     ]
 
     def insert(self, record: dict):
+        '''
+        Params
+        ------
+        `record`
+        - The record to insert, containing the exact `columns`:
+            - PlaylistID, TrackID, Platform, Position
+        '''
         # validate record
         validation_result = self.validate(record)
         if not validation_result.ok:
@@ -360,6 +402,16 @@ class PlaylistTracksCollection(Collection):
         `record`
           - The filter to match by. Only column PlaylistID and Platform will be used as the filter
             and must be provided. Setting record = '*' fetches all data from the cache
+
+        Returns
+        ------
+        - `Err(validation_err_msg)` if record is invalid
+        - `Err(sqlite3.Error)` if record insertion fails
+        - `Ok(records: List[sqlite3.Row])` if insertion is successful
+            - each record contains the fields:
+                - Position
+                - PlaylistID, Platform, PlaylistTitle, PlaylistOwner, PlaylistDescription, PlaylistThumbnail, Length, Etag
+                - TrackID, TrackPlatform, TrackTitle, TrackOwner, TrackThumbnail, DurationSeconds
         '''
 
         if record == '*':
@@ -379,9 +431,15 @@ class PlaylistTracksCollection(Collection):
         result = self.try_execute('''
             SELECT
                 PlaylistTracks.Position,
-                Playlist.PlaylistID, Playlist.Platform, Playlist.Title, Playlist.Owner, Playlist.Description,
-                Playlist.Thumbnail, Playlist.Length, Playlist.Etag,
-                Track.TrackID, Track.Platform, Track.Title, Track.Owner, Track.Thumbnail, Track.DurationSeconds
+
+                Playlist.PlaylistID,                           Playlist.Platform AS "Platform",
+                Playlist.Title AS "PlaylistTitle",             Playlist.Owner AS "PlaylistOwner",
+                Playlist.Description AS "PlaylistDescription", Playlist.Thumbnail AS "PlaylistThumbnail",
+                Playlist.Length,                               Playlist.Etag,
+
+                Track.TrackID,                                 Track.Platform AS "TrackPlatform",
+                Track.Title AS "TrackTitle",                   Track.Owner AS "TrackOwner",
+                Track.Thumbnail AS "TrackThumbnail",           Track.DurationSeconds
             FROM PlaylistTracks
             INNER JOIN Playlist
             ON
@@ -389,7 +447,7 @@ class PlaylistTracksCollection(Collection):
                 AND Playlist.Platform = PlaylistTracks.Platform
             INNER JOIN Track
             ON
-                Track.TrackID = PlaylistTracks.Position
+                Track.TrackID = PlaylistTracks.TrackID
                 AND Track.Platform = PlaylistTracks.Platform
             WHERE Playlist.PlaylistID = ? AND Playlist.Platform = ?
             ORDER BY Position ASC;
