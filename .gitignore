@@ -2,10 +2,8 @@
 **/.vscode/
 
 # python venv
-Include/
-Lib/
-Scripts/
-pyvenv.cfg
+pyenv/
+pyenv-dev/
 
 # python
 **/__pycache__/
@@ -15,3 +13,6 @@ pyvenv.cfg
 
 # databases
 **/*.db
+
+# jupyter notebook files for debugging
+**/*.debug.ipynb
