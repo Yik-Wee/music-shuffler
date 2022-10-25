@@ -1,12 +1,16 @@
-from typing import Union
-from .base import PlatformApi, Playlist
+from typing import Optional, Union
+from .base import PlatformApi, Playlist, PlaylistInfo
 
 class SpotifyApi(PlatformApi):
     def __init__(self) -> None:
-        super().__init__(base_url='oiwefobwofeboerf')
+        super().__init__(platform='SPOTIFY')
 
-    def playlist(self, playlist_id: str) -> Union[Playlist, None]:
+    def playlist(
+        self,
+        playlist_id: str,
+        playlist_info: Optional[PlaylistInfo] = None
+    ) -> Union[Playlist, None]:
         pass
 
-    def etag(self, playlist_id: str) -> Union[str, None]:
-        return super().etag(playlist_id)
+    def playlist_info(self, playlist_id: str) -> Union[str, None]:
+        return super().playlist_info(playlist_id)

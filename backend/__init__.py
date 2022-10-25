@@ -23,6 +23,12 @@ def create_database(db_path: str = DB_PATH):
     __DbInitialiser.create_database(db_path)
 
 
+def clear_database(db_path: str = DB_PATH):
+    '''Clears the entire database file'''
+    with open(db_path, 'wb') as _:
+        pass
+
+
 class CollectionDict(TypedDict):
     Playlist: PlaylistCollection
     PlaylistTracks: PlaylistTracksCollection

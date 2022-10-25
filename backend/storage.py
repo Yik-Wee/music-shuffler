@@ -115,6 +115,29 @@ class Collection:
             return Err(err)
         return Ok()
 
+    def try_executemany(
+        self,
+        sql: str,
+        seq_of_values: List[Union[list, dict]],
+        commit: bool = True,
+        cursor_callback: Optional[Callable[[sqlite3.Cursor], Any]] = None,
+    ) -> Result:
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                conn.row_factory = sqlite3.Row
+                cur = conn.cursor()
+                cur.execute('PRAGMA foreign_keys = ON;')
+                cur.executemany(sql, seq_of_values)
+                if commit:
+                    conn.commit()
+
+                if cursor_callback is not None:
+                    results = cursor_callback(cur)
+                    return Ok(results)
+        except sqlite3.Error as err:
+            return Err(err)
+        return Ok()
+
     def insert(self, record: dict) -> Result:
         '''
         Params
@@ -247,7 +270,7 @@ class TrackCollection(Collection):
         Column('Title'),
         Column('Owner'),
         Column('Thumbnail', default='', is_required=False),
-        Column('DurationSeconds'),
+        Column('DurationSeconds', default=None, is_required=False),
     ]
 
     def insert(self, record: dict) -> Result:
@@ -274,6 +297,19 @@ class TrackCollection(Collection):
             INSERT OR IGNORE INTO Track (TrackID, Platform, Title, Owner, Thumbnail, DurationSeconds)
             VALUES (:TrackID, :Platform, :Title, :Owner, :Thumbnail, :DurationSeconds)
         ''', record)
+        return result
+
+    def insertmany(self, list_of_records: List[dict]) -> Result:
+        # validate records
+        # for record in list_of_records:
+        #     validation_result = self.validate(record)
+        #     if not validation_result.ok:
+        #         return validation_result
+
+        result = self.try_executemany('''
+            INSERT OR IGNORE INTO Track (TrackID, Platform, Title, Owner, Thumbnail, DurationSeconds)
+            VALUES (:TrackID, :Platform, :Title, :Owner, :Thumbnail, :DurationSeconds)
+        ''', list_of_records)
         return result
 
     def delete(self, record: Union[dict, str]) -> Result:
@@ -364,6 +400,13 @@ class PlaylistTracksCollection(Collection):
             INSERT INTO PlaylistTracks (PlaylistID, TrackID, Platform, Position)
             VALUES (:PlaylistID, :TrackID, :Platform, :Position)
         ''', record)
+        return result
+
+    def insertmany(self, list_of_records: List[dict]) -> Result:
+        result = self.try_execute('''
+            INSERT INTO PlaylistTracks (PlaylistID, TrackID, Platform, Position)
+            VALUES (:PlaylistID, :TrackID, :Platform, :Position)
+        ''', list_of_records)
         return result
 
     def delete(self, record: Union[dict, str]) -> Result:

@@ -9,19 +9,10 @@ from backend import (
 )
 from backend.api import Playlist, Track
 from platforms import platform_apis, ALL_PLATFORMS
+from debug_utils import print_green, print_red
 
 BUILD_DIR = './frontend/build'
 app = Flask(__name__)
-
-
-def print_red(msg: str, **kwargs):
-    '''Prints the `msg` in bold red for debugging'''
-    print(f'\x1b[1;31m{msg}\x1b[0m', **kwargs)
-
-
-def print_green(msg: str, **kwargs):
-    '''Prints the `msg` in bold green for debugging'''
-    print(f'\x1b[1;32m{msg}\x1b[0m', **kwargs)
 
 
 @app.route('/', defaults={'path': 'index.html'})
@@ -49,7 +40,10 @@ def api_endpoint(platform: str):
     api = platform_apis[platform]
 
     # request YouTube API endpoint for playlist etag
-    etag = api.etag(playlist_id)
+    playlist_info = api.playlist_info(playlist_id)
+    etag = None
+    if playlist_info is not None:
+        etag = playlist_info.get('etag')
 
     # compare with cache etag
     if etag is not None:
@@ -111,7 +105,7 @@ def api_endpoint(platform: str):
 
     # etag is None or different etag means playlist contents have changed
     # request for new playlist contents
-    playlist = api.playlist(playlist_id)
+    playlist = api.playlist(playlist_id, playlist_info)
     if playlist is None:
         return {'error': f'Playlist with Playlist ID {playlist_id} not found'}
 
@@ -127,10 +121,12 @@ def api_endpoint(platform: str):
     })
     if not res.ok:
         print_red(
-            f'Error deleting from PlaylistTracks (PlaylistID = {playlist_id}, Platform = {platform}): {res}'
-        )
+            'Error deleting from PlaylistTracks '\
+            f'(PlaylistID = {playlist_id}, Platform = {platform}): {res}')
     else:
-        print_green(f'Successfully deleted from PlaylistTracks (PlaylistID = {playlist_id}, Platform = {platform})')
+        print_green(
+            'Successfully deleted from PlaylistTracks '\
+            f'(PlaylistID = {playlist_id}, Platform = {platform})')
 
     res = playlist_coll.delete({
         'PlaylistID': playlist_id,
@@ -138,10 +134,12 @@ def api_endpoint(platform: str):
     })
     if not res.ok:
         print_red(
-            f'Error deleting from Playlist (PlaylistID = {playlist_id}, Platform = {platform}): {res}'
-        )
+            'Error deleting from Playlist '\
+            f'(PlaylistID = {playlist_id}, Platform = {platform}): {res}')
     else:
-        print_green(f'Successfully deleted from Playlist (PlaylistID = {playlist_id}, Platform = {platform})')
+        print_green(
+            'Successfully deleted from Playlist '\
+            f'(PlaylistID = {playlist_id}, Platform = {platform})')
 
     # insert the new cache
     res = playlist_coll.insert({
@@ -155,40 +153,46 @@ def api_endpoint(platform: str):
         'Platform': platform,
     })
     if not res.ok:
-        print_red(f'Error inserting into Playlist (PlaylistID = {playlist_id}): {res}')
+        print_red(
+            'Error inserting into Playlist '\
+            f'(PlaylistID = {playlist_id}, Platform = {platform}): {res}')
     else:
-        print_green(f'Successfully inserted into Playlist (PlaylistID = {playlist_id})')
+        print_green(
+            'Successfully inserted into Playlist '\
+            f'(PlaylistID = {playlist_id}, Platform = {platform})')
 
+    tracks_to_insert = []
+    playlist_tracks_to_insert = []
     for i, track in enumerate(playlist['tracks']):
-        res = track_coll.insert({
+        track_record = {
             'TrackID': track['track_id'],
             'Platform': platform,
             'Title': track['title'],
             'Owner': track['owner'],
             'Thumbnail': track['thumbnail'],
             'DurationSeconds': track['duration_seconds']
-        })
-        if not res.ok:
-            print_red(f'Error inserting into Track (TrackID = {track["track_id"]}): {res}')
-        else:
-            print_green(f'Successfully inserted into Track (TrackID = {track["track_id"]})')
+        }
+        tracks_to_insert.append(track_record)
 
-        res = playlist_tracks_coll.insert({
+        playlist_track_record = {
             'PlaylistID': playlist_id,
             'TrackID': track['track_id'],
             'Platform': track['platform'],
             'Position': i,
-        })
-        if not res.ok:
-            print_red(
-                f'Error inserting into PlaylistTracks (PlaylistID = {playlist_id}, TrackID = {track["track_id"]}): ' \
-                f'{res}'
-            )
-        else:
-            print_green(
-                'Successfully inserted into PlaylistTracks' \
-                f'(PlaylistID = {playlist_id}, TrackID = {track["track_id"]})'
-            )
+        }
+        playlist_tracks_to_insert.append(playlist_track_record)
+
+    res = track_coll.insertmany(tracks_to_insert)
+    if not res.ok:
+        print_red(f'Error inserting many into Track: {res}')
+    else:
+        print_green('Successfully inserted many into Track')
+
+    playlist_tracks_coll.insertmany(playlist_tracks_to_insert)
+    if not res.ok:
+        print_red(f'Error inserting many into PlaylistTracks (PlaylistID = {playlist_id}): {res}')
+    else:
+        print_green(f'Successfully inserted many into PlaylistTracks (PlaylistID = {playlist_id})')
 
     # return playlist contents as JSON
     return playlist

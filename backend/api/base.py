@@ -22,7 +22,30 @@ class Track(TypedDict):
     duration_seconds: int
 
 
-class Playlist(TypedDict):
+class PlaylistInfo(TypedDict):
+    '''
+    ```
+    {
+        'platform': str,
+        'playlist_id': str,
+        'title': str,
+        'owner': str,
+        'description': str,
+        'thumbnail': str,
+        'etag': str,
+    }
+    ```
+    '''
+    platform: str
+    playlist_id: str
+    title: str
+    owner: str
+    description: str
+    thumbnail: str
+    etag: str
+
+
+class Playlist(PlaylistInfo):
     '''
     ```
     {
@@ -38,14 +61,7 @@ class Playlist(TypedDict):
     }
     ```
     '''
-    platform: str
-    playlist_id: str
-    title: str
-    owner: str
-    description: str
-    thumbnail: str
     length: int
-    etag: str
     tracks: List[Track]
 
 
@@ -56,24 +72,30 @@ class PlatformApi:
 
     Attributes
     ------
-    `base_url`
-    - The base url for the API endpoint
+    `platform`
+    - The music platform in uppercase. supported platforms are:
+        - `"YOUTUBE", "PLAYLIST", "SPOTIFY"`
 
     Methods
     ------
     `playlist(self, playlist_id)`
-    - Gets the playlist with the specified `playlist_id` from the API endpoint from `base_url
+    - Gets the playlist with the specified `playlist_id`
     - Returns the `Playlist` dict if playlist is found, `None` if not found
 
-    `etag(self, playlist_id)`
-    - Returns the etag of the playlist with the specified `playlist_id`, `None` if not found
+    `playlist_info(self, playlist_id)`
+    Returns the `Playlist` info without the `tracks` or `length`
     '''
 
-    def __init__(self, base_url: str) -> None:
-        self.base_url = base_url
+    def __init__(self, platform: str) -> None:
+        self.platform = platform
 
     def playlist(self, playlist_id: str) -> Union[Playlist, None]:
         raise NotImplementedError()
 
-    def etag(self, playlist_id: str) -> Union[str, None]:
+    def playlist_info(self, playlist_id: str) -> Union[PlaylistInfo, None]:
+        '''
+        Returns
+        ------
+        The `PlaylistInfo` which doesn't include fields `tracks` or `length`
+        '''
         raise NotImplementedError()
