@@ -9,7 +9,7 @@ from backend import (
 )
 from backend.api import Playlist, Track
 from platforms import platform_apis, ALL_PLATFORMS
-from debug_utils import print_green, print_red
+from debug_utils import print_blue, print_green, print_red
 
 BUILD_DIR = './frontend/build'
 app = Flask(__name__)
@@ -40,6 +40,7 @@ def api_endpoint(platform: str):
     api = platform_apis[platform]
 
     # request YouTube API endpoint for playlist etag
+    print_blue(f'({platform}) Fetching playlist_info(playlist_id={playlist_id})')
     playlist_info = api.playlist_info(playlist_id)
     etag = None
     if playlist_info is not None:
@@ -57,6 +58,7 @@ def api_endpoint(platform: str):
             return {'error': f'Error fetching cached playlist\'s etag. {result.err()}'}, 500
 
         if len(result.value) == 0:
+            cached_record = None
             cached_etag = None
         else:
             cached_record = result.value[0]
@@ -71,21 +73,14 @@ def api_endpoint(platform: str):
                 return {'error': f'Error fetching cached playlist. {result.err()}'}
 
             records = result.value
-            if len(records) == 0:
-                return {
-                    'platform': platform,
-                    'playlist_id': playlist_id,
-                    'tracks': [],
-                }
-
             playlist: Playlist = {
                 'platform': platform,
                 'playlist_id': playlist_id,
-                'title': records[0]['PlaylistTitle'],
-                'owner': records[0]['PlaylistOwner'],
-                'description': records[0]['PlaylistDescription'],
-                'thumbnail': records[0]['PlaylistThumbnail'],
-                'length': records[0]['Length'],
+                'title': cached_record['Title'],
+                'owner': cached_record['Owner'],
+                'description': cached_record['Description'],
+                'thumbnail': cached_record['Thumbnail'],
+                'length': cached_record['Length'],
                 'etag': etag,
                 'tracks': [],
             }
@@ -105,9 +100,10 @@ def api_endpoint(platform: str):
 
     # etag is None or different etag means playlist contents have changed
     # request for new playlist contents
+    print_blue(f'({platform}) Fetching playlist(playlist_id={playlist_id})')
     playlist = api.playlist(playlist_id, playlist_info)
     if playlist is None:
-        return {'error': f'Playlist with Playlist ID {playlist_id} not found'}
+        return {'error': f'Playlist with Playlist ID {playlist_id} not found'}, 404
 
     # cache the new playlist
     playlist_coll = colls['Playlist']

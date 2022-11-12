@@ -20,6 +20,7 @@ class Column:
     `is_required`
       - Whether the column requires a value
     '''
+
     def __init__(self, column_name: str, default=None, is_required: bool = True):
         self.column_name = column_name
         self.default = default
@@ -403,7 +404,7 @@ class PlaylistTracksCollection(Collection):
         return result
 
     def insertmany(self, list_of_records: List[dict]) -> Result:
-        result = self.try_execute('''
+        result = self.try_executemany('''
             INSERT INTO PlaylistTracks (PlaylistID, TrackID, Platform, Position)
             VALUES (:PlaylistID, :TrackID, :Platform, :Position)
         ''', list_of_records)
@@ -496,4 +497,3 @@ class PlaylistTracksCollection(Collection):
             ORDER BY Position ASC;
         ''', (playlist_id, platform), commit=False, cursor_callback=lambda cur: cur.fetchall())
         return result
-
