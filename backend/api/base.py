@@ -1,4 +1,4 @@
-from typing import List, TypedDict, Union
+from typing import List, Optional, TypedDict, Union
 
 
 class Track(TypedDict):
@@ -89,7 +89,11 @@ class PlatformApi:
     def __init__(self, platform: str) -> None:
         self.platform = platform
 
-    def playlist(self, playlist_id: str) -> Union[Playlist, None]:
+    def playlist(
+        self,
+        playlist_id: str,
+        playlist_info: Optional[PlaylistInfo] = None
+    ) -> Union[Playlist, None]:
         raise NotImplementedError()
 
     def playlist_info(self, playlist_id: str) -> Union[PlaylistInfo, None]:

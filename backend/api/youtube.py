@@ -45,6 +45,7 @@ class YouTubeApi(PlatformApi):
     ) -> Union[Playlist, None]:
         # https://developers.google.com/youtube/v3/docs/playlistItems/list#usage
         playlist_id = playlist_id.strip()
+
         url = 'https://www.googleapis.com/youtube/v3/playlistItems'\
             f'?part=snippet&maxResults=50&playlistId={playlist_id}&key={self.api_key}'
 
@@ -124,7 +125,7 @@ class YouTubeApi(PlatformApi):
             'length': length,
             'tracks': tracks,
         }
-
+        
         return playlist_
 
     def playlist_info(self, playlist_id: str) -> Union[PlaylistInfo, None]:
