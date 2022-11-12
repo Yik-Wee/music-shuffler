@@ -1,11 +1,13 @@
 <script>
-	import { enhance } from '$app/forms';
+	// import { enhance } from '$app/forms';
 </script>
 
 <h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
-<a href="/test">Test route</a>
+<a href="/youtube">Search YouTube Playlist</a>
+<a href="/spotify">Search Spotify Playlist</a>
+<a href="/soundcloud">Search SoundCloud Playlist</a>
+
 <!-- <form action="/test" method="get" use:enhance>
-	<input type="text" placeholder="test input" />
+	<input type="text" name="id" placeholder="Playlist ID" />
     <input type="submit" value="submit">
 </form> -->
