@@ -1,22 +1,30 @@
 <script lang="ts">
-    import { PlayerController, playerNames, players } from '../stores';
+    import { PlayerController, playerNames, players, recentlyPlayed } from '../stores';
     import { onMount } from 'svelte';
     import SoundCloudPlayer from '../components/Player/SoundCloudPlayer.svelte';
     import SpotifyPlayer from '../components/Player/SpotifyPlayer.svelte';
     import YouTubePlayer from '../components/Player/YouTubePlayer.svelte';
+    import SearchBar from '../components/SearchBar.svelte';
 
     onMount(() => {
-        players.controller = new PlayerController();
-        let recentlyPlayedString = localStorage.getItem('recentlyPlayed');
-        let recentlyPlayed = recentlyPlayedString ? JSON.parse(recentlyPlayedString) : undefined;
-        if (!recentlyPlayed) {
-            players.controller?.hideAll();
+        let controller = new PlayerController();
+        players.controller = controller;
+
+        let recent = recentlyPlayed();
+        console.log(recent);
+
+        if (recent) {
+            controller.swapPlayer(recent.platform);
+            controller.load(recent.trackId, recent.startSeconds);
+            controller.play();
+        } else {
+            controller.hideAll();
         }
-        players.controller?.swapPlayer(playerNames[0]);
     });
 </script>
 
 <main data-sveltekit-prefetch>
+    <SearchBar />
     <div id="players-container">
         <SpotifyPlayer />
         <YouTubePlayer />

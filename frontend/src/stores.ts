@@ -7,6 +7,37 @@ import { YouTubePlayerState, type YouTubePlayer } from './types/YouTubePlayer';
 // export let spotifyPlayer: Writable<SpotifyPlayer | undefined> = writable(undefined);
 // export let soundcloudPlayer: Writable<SoundCloudPlayer | undefined> = writable(undefined);
 
+type RecentlyPlayed = {
+    platform: string;
+    trackId: string;
+    startSeconds?: number;
+};
+
+export function recentlyPlayed(): RecentlyPlayed | null {
+    // <platform>:<trackId>:<startSeconds | empty>
+    let parts = localStorage.getItem('recentlyPlayed')?.split(':');
+
+    if (!parts) {
+        return null;
+    }
+
+    if (parts.length !== 3) {
+        localStorage.removeItem('recentlyPlayed');
+        return null;
+    }
+
+    let startSeconds: number | undefined = parseInt(parts[2]);
+    if (isNaN(startSeconds)) {
+        startSeconds = undefined;
+    }
+
+    return {
+        platform: parts[0],
+        trackId: parts[1],
+        startSeconds
+    };
+}
+
 type Players = {
     youtube: YouTubePlayer | undefined;
     spotify: SpotifyPlayer | undefined;
