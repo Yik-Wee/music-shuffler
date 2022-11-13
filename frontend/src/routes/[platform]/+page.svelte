@@ -2,7 +2,7 @@
     import type { PageData } from './$types';
     import { page } from '$app/stores';
     import { onMount } from 'svelte';
-    import { isErrorResponse, type PlaylistResponse } from './ApiResponse';
+    import { isErrorResponse, type PlaylistResponse } from '../../types/PlaylistTracks';
     import { getPlaylist } from './requests';
 
     export let data: PageData;

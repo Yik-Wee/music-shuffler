@@ -1,4 +1,4 @@
-import { isErrorResponse, type ErrorResponse, type PlaylistResponse } from './ApiResponse';
+import { isErrorResponse, type ErrorResponse, type PlaylistResponse } from '../../types/PlaylistTracks';
 
 function toEndpoint(platform: string, id: string): string {
     return `/api/playlist/${platform}?id=${id}`;
