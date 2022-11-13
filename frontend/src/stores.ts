@@ -1,4 +1,6 @@
 // import { writable, type Writable } from 'svelte/store';
+import { writable, type Writable } from 'svelte/store';
+import type { Track } from './types/PlaylistTracks';
 import type { SoundCloudPlayer } from './types/SoundCloudPlayer';
 import type SpotifyPlayer from './types/SpotifyPlayer';
 import { YouTubePlayerState, type YouTubePlayer } from './types/YouTubePlayer';
@@ -7,6 +9,7 @@ import { YouTubePlayerState, type YouTubePlayer } from './types/YouTubePlayer';
 // export let spotifyPlayer: Writable<SpotifyPlayer | undefined> = writable(undefined);
 // export let soundcloudPlayer: Writable<SoundCloudPlayer | undefined> = writable(undefined);
 
+// ==========Players==========
 type RecentlyPlayed = {
     platform: string;
     trackId: string;
@@ -232,3 +235,121 @@ export class PlayerController implements Player {
         }
     }
 }
+
+// ==========Now Playing (Track Queue)==========
+
+interface ITrackQueue {
+    // ...
+    position: number;
+    tracks: Track[];
+    shuffle(): void;
+    currentTrack(): Track;
+    length(): number;
+    play(): void;
+    pause(): void;
+    toggle(): void;
+    playNext(): void;
+    playPrev(): void;
+}
+
+class TrackQueue implements ITrackQueue {
+    private _position: number;
+    private _tracks: Track[];
+
+    constructor(tracks?: Track[]) {
+        this._tracks = tracks || [];
+
+        if (this.length() > 0) {
+            this._position = 0;
+            let track = this.currentTrack();
+            players.controller?.load(track.track_id);
+        } else {
+            this._position = -1;
+        }
+    }
+
+    public get position(): number {
+        return this._position;
+    }
+
+    private set position(value: number) {
+        if (value >= 0 && value < this.length()) {
+            this._position = value;
+        }
+    }
+
+    public get tracks(): Track[] {
+        return this._tracks;
+    }
+
+    public set tracks(value: Track[]) {
+        this.position = 0;
+        this._tracks = value;
+    }
+
+    shuffle(): void {
+        // 0 or 1 tracks is alr shuffled
+        if (this.length() <= 1) {
+            return;
+        }
+
+        [this.tracks[0], this.tracks[this.position]] = [this.tracks[this.position], this.tracks[0]];
+        let n = this.length() - 1;
+        for (let i = 1; i < this.length(); i++) {
+            let r = Math.round(Math.random() * n);
+            [this.tracks[i], this.tracks[r]] = [this.tracks[r], this.tracks[i]];
+        }
+    }
+
+    currentTrack(): Track {
+        return this.tracks[this.position];
+    }
+
+    length(): number {
+        return this.tracks.length;
+    }
+
+    play(): void {
+        players.controller?.play();
+    }
+
+    pause(): void {
+        players.controller?.pause();
+    }
+
+    toggle(): void {
+        players.controller?.toggle();
+    }
+
+    playNext(): void {
+        if (this.lastTrackReached()) {
+            return;
+        }
+
+        this.position += 1;
+        let track = this.currentTrack();
+        players.controller?.load(track.track_id);
+        this.play();
+    }
+
+    playPrev(): void {
+        if (this.firstTrackReached()) {
+            return;
+        }
+
+        this.position -= 1;
+        let track = this.currentTrack();
+        players.controller?.load(track.track_id);
+        this.play();
+    }
+
+    firstTrackReached(): boolean {
+        return this.position <= 0;
+    }
+
+    lastTrackReached(): boolean {
+        return this.position >= this.length() - 1;
+    }
+}
+
+export let trackQueue: Writable<TrackQueue> = writable(new TrackQueue());
