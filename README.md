@@ -8,6 +8,8 @@
 - [ ] Add playlists to frontend (`fetch` from API -> display -> shuffle)
 - [ ] Add caching **playlist IDs** and mixes (`playlistID[]`) in `localStorage` -> `fetch` title, owner & length from API endpoint
 - [ ] Add playlist mixes to frontend (shuffle tracks from multiple playlists)
+- [ ] Add specific tracks from different playlists to queue
+- [ ] Ability to empty the queue
 - [ ] Add styling to frontend
 - [ ] Add settings
 - [ ] API cache so when user reloads page, `api_endpoint()` will wait for the previous API call to complete and use that result instead of making another API call
@@ -17,8 +19,9 @@
 # Navigation
 ## Non-navbar Routes
 ### `/[platform]?id=...`
-  - fetches playlist contents -> display & shuffle
-  - **(1?)** Cancel button to cancel fetching of contents & display partial contents
+  - fetches playlist info (NOT tracks)
+  - When the playlist card / play button is clicked, store `id` GET param in `store`, redirect to `/queue?id=...`
+  <!-- - **(1?)** Cancel button to cancel fetching of contents & display partial contents -->
 ## Navbar routes
 ### Home
 - Display recently played playlist(s)
@@ -26,9 +29,16 @@
 ### Library
 #### Playlists
 - This section displays saved playlists
-- When a playlist card is clicked, route to `/[platform]?id=<playlistID>`
+- Select multiple playlists (/ specific tracks ?) to create a new mix
+<!-- - When a playlist card is clicked, route to `/[platform]?id=<playlistID>` -->
+- When a playlist card is clicked, route to `/queue?id=...`
 #### Mixes
 - This section displays the created mixes
+### Queue
+- Get playlist ID / Mix ID from the url GET params `?id`
+  - Playlist: `?id=<playlist_id>`
+  - Mix: `?id=<MIX ID>` e.g. `?id=MIX23`
+- Fetch tracks, display & shuffle
 ### Search
 - Search bar at the top. Disappears on scroll down, reappears on scroll up
 - When searched, route to `/[platform]?id=<playlistID>`
