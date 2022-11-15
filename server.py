@@ -29,22 +29,124 @@ def index(path: str):
 
 
 # API routes
+
+@app.route('/api/playlist_info/<platform>', methods=['GET'])
+def api_playlist_info(platform: str):
+    '''Returns the info of the playlist without the tracks & length as a JSON response'''
+    if platform not in ALL_PLATFORMS:
+        return {'error': f'Unsupported Platform {platform}'}, 404
+
+    playlist_id = request.args.get('id')
+
+    if playlist_id is None:
+        return {'error': 'No playlist ID provided'}, 404
+
+    platform = platform.upper()
+    api = platform_apis[platform]
+
+    # check cache
+    res = colls['Playlist'].find({
+        'Platform': platform,
+        'PlaylistID': playlist_id,
+    })
+
+    if res.ok and len(res.value) == 1:
+        playlist_info = res.value[0]
+        print_blue(f'Found Playlist {playlist_info["Title"]} with PlaylistID {playlist_id} in cache')
+
+        return {
+            'platform': platform,
+            'playlist_id': playlist_id,
+            'title': playlist_info['Title'],
+            'owner': playlist_info['Owner'],
+            'description': playlist_info['Description'],
+            'thumbnail': playlist_info['Thumbnail'],
+            'etag': playlist_info['Etag'],
+        }, 200
+
+    # not found in cache, fetch from API and replace cache
+    playlist_info = api.playlist_info(playlist_id)
+    if playlist_info is None:
+        return {'error': f'Playlist with Playlist ID {playlist_id} not found'}, 404
+
+    colls['Playlist'].delete({
+        'Platform': platform,
+        'PlaylistID': playlist_id,
+    })
+
+    colls['Playlist'].insert({
+        'PlaylistID': playlist_id,
+        'Title': playlist_info['title'],
+        'Owner': playlist_info['owner'],
+        'Description': playlist_info['description'],
+        'Thumbnail': playlist_info['thumbnail'],
+        # 'Length': playlist_info['length'],
+        'Etag': playlist_info['etag'],
+        'Platform': platform,
+    })
+
+    print_blue(f'Inserted {playlist_id} into Playlist cache')
+
+    return playlist_info, 200
+
+
 @app.route('/api/playlist/<platform>', methods=['GET'])
-def api_endpoint(platform: str):
+def api_full_playlist(platform: str):
     '''API endpoint for fetching playlist data'''
     if platform not in ALL_PLATFORMS:
         return {'error': f'Unsupported Platform {platform}'}, 404
 
     playlist_id = request.args.get('id')
+
+    if playlist_id is None:
+        return {'error': 'No playlist ID provided'}, 404
+
     platform = platform.upper()
     api = platform_apis[platform]
 
-    # request YouTube API endpoint for playlist etag
-    print_blue(f'({platform}) Fetching playlist_info(playlist_id={playlist_id})')
-    playlist_info = api.playlist_info(playlist_id)
-    etag = None
-    if playlist_info is not None:
-        etag = playlist_info.get('etag')
+    # request API endpoint for playlist etag
+    print_blue(
+        f'({platform}) Fetching playlist_info(playlist_id={playlist_id})')
+    # playlist_info = api.playlist_info(playlist_id)
+    response, status_code = api_playlist_info(platform.lower())
+    if status_code == 404:
+        return response, status_code
+
+    playlist_info = response
+    print(playlist_info)
+
+    # playlist does not exist
+    if playlist_info is None:
+        # delete the old cache e.g. if playlist became private/deleted
+        res = colls['PlaylistTracks'].delete({
+            'PlaylistID': playlist_id,
+            'Platform': platform,
+        })
+        if not res.ok:
+            print_red(
+                'Error deleting from PlaylistTracks '
+                f'(PlaylistID = {playlist_id}, Platform = {platform}): {res}')
+        else:
+            print_green(
+                'Successfully deleted from PlaylistTracks '
+                f'(PlaylistID = {playlist_id}, Platform = {platform})')
+
+        res = colls['Playlist'].delete({
+            'PlaylistID': playlist_id,
+            'Platform': platform,
+        })
+        if not res.ok:
+            print_red(
+                'Error deleting from Playlist '
+                f'(PlaylistID = {playlist_id}, Platform = {platform}): {res}')
+        else:
+            print_green(
+                'Successfully deleted from Playlist '
+                f'(PlaylistID = {playlist_id}, Platform = {platform})')
+
+        return {'error': f'Playlist with Playlist ID {playlist_id} not found'}, 404
+
+    etag = playlist_info.get('etag')
 
     # compare with cache etag
     if etag is not None:
@@ -60,13 +162,19 @@ def api_endpoint(platform: str):
         if len(result.value) == 0:
             cached_record = None
             cached_etag = None
+            use_cache = False
         else:
             cached_record = result.value[0]
             cached_etag = cached_record['Etag']
+            if cached_record['Length'] == -1:
+                use_cache = False
+            else:
+                use_cache = etag == cached_etag
 
         # same etag means playlist contents are unchanged
         # get playlist contents from cache
-        if etag == cached_etag:
+        # if etag == cached_etag:
+        if use_cache:
             playlist_tracks_coll = colls['PlaylistTracks']
             result = playlist_tracks_coll.find(record)
             if not result.ok:
@@ -86,7 +194,7 @@ def api_endpoint(platform: str):
             }
 
             for record in records:
-                # PlaylistId, TrackID, Platform, Position
+                # PlaylistID, TrackID, Platform, Position
                 track: Track = {
                     'track_id': record['TrackID'],
                     'platform': record['TrackPlatform'],
@@ -117,11 +225,11 @@ def api_endpoint(platform: str):
     })
     if not res.ok:
         print_red(
-            'Error deleting from PlaylistTracks '\
+            'Error deleting from PlaylistTracks '
             f'(PlaylistID = {playlist_id}, Platform = {platform}): {res}')
     else:
         print_green(
-            'Successfully deleted from PlaylistTracks '\
+            'Successfully deleted from PlaylistTracks '
             f'(PlaylistID = {playlist_id}, Platform = {platform})')
 
     res = playlist_coll.delete({
@@ -130,11 +238,11 @@ def api_endpoint(platform: str):
     })
     if not res.ok:
         print_red(
-            'Error deleting from Playlist '\
+            'Error deleting from Playlist '
             f'(PlaylistID = {playlist_id}, Platform = {platform}): {res}')
     else:
         print_green(
-            'Successfully deleted from Playlist '\
+            'Successfully deleted from Playlist '
             f'(PlaylistID = {playlist_id}, Platform = {platform})')
 
     # insert the new cache
@@ -150,11 +258,11 @@ def api_endpoint(platform: str):
     })
     if not res.ok:
         print_red(
-            'Error inserting into Playlist '\
+            'Error inserting into Playlist '
             f'(PlaylistID = {playlist_id}, Platform = {platform}): {res}')
     else:
         print_green(
-            'Successfully inserted into Playlist '\
+            'Successfully inserted into Playlist '
             f'(PlaylistID = {playlist_id}, Platform = {platform})')
 
     tracks_to_insert = []
@@ -186,9 +294,11 @@ def api_endpoint(platform: str):
 
     playlist_tracks_coll.insertmany(playlist_tracks_to_insert)
     if not res.ok:
-        print_red(f'Error inserting many into PlaylistTracks (PlaylistID = {playlist_id}): {res}')
+        print_red(
+            f'Error inserting many into PlaylistTracks (PlaylistID = {playlist_id}): {res}')
     else:
-        print_green(f'Successfully inserted many into PlaylistTracks (PlaylistID = {playlist_id})')
+        print_green(
+            f'Successfully inserted many into PlaylistTracks (PlaylistID = {playlist_id})')
 
     # return playlist contents as JSON
     return playlist
