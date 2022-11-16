@@ -73,7 +73,7 @@ class YouTubeApi(PlatformApi):
             thumbnail = choose_thumbnail(all_thumbnails)
 
             track = {
-                'track_id': item['id'],
+                'track_id': item['snippet']['resourceId']['videoId'],
                 'platform': self.platform,
                 'title': item['snippet']['title'],
                 'owner': item['snippet']['channelTitle'],
