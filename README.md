@@ -12,9 +12,11 @@
 - [ ] Ability to empty the queue
 - [ ] Add styling to frontend
 - [ ] Add settings
-- [ ] API cache so when user reloads page, `api_endpoint()` will wait for the previous API call to complete and use that result instead of making another API call
 - [ ] **(1?)** Use 206 partial response with flask API routes, using `yield` and `generator(), ...`
   - Reference: https://flask.palletsprojects.com/en/2.2.x/patterns/streaming/
+- [ ] **(2?)** API cache so when user reloads page, `api_endpoint()` will wait for the previous API call to complete and use that result instead of making another API call
+- [ ] **(3?)** If playlist/mix `length > 5000`, make a request to `/api/random_track?platform=...&id=...` instead of storing the entire playlist which would take up too much memory
+- [ ] **(4?)** If playlist/mix `length > 5000`, randomise the `position` pointer to get the next random track which takes O(1) time instead of shuffling then rerendering the queue taking O(n) time
 
 # Navigation
 ## Non-navbar Routes
