@@ -171,7 +171,8 @@ class PlaylistCollection(Collection):
         Column('Owner'),
         Column('Description', default='', is_required=False),
         Column('Thumbnail', default='', is_required=False),
-        Column('Length', default=-1, is_required=False),  # -1 if no PlaylistTracks stored yet
+        # -1 if no PlaylistTracks stored yet
+        Column('Length', default=-1, is_required=False),
         Column('Etag', is_required=False),
         Column('Platform'),
     ]
@@ -408,6 +409,27 @@ class PlaylistTracksCollection(Collection):
             INSERT INTO PlaylistTracks (PlaylistID, TrackID, Platform, Position)
             VALUES (:PlaylistID, :TrackID, :Platform, :Position)
         ''', list_of_records)
+
+        if not result.ok:
+            return result
+
+        # update "Length" of Playlist table
+        # PlaylistID and Platform should be consistent throughout all list_of_records
+        # otherwise it would violate FK constraint & `Err()` result would have been returned
+        playlist_id = list_of_records[0]['PlaylistID']
+        platform = list_of_records[0]['Platform']
+
+        result = self.try_execute('''
+            UPDATE Playlist
+            SET Length = (
+                SELECT COUNT(*) AS Length
+                FROM PlaylistTracks
+                WHERE
+                    PlaylistID = :PlaylistID AND
+                    Platform = :Platform
+            )
+            WHERE PlaylistID = :PlaylistID AND Platform = :Platform;
+        ''', {'PlaylistID': playlist_id, 'Platform': platform})
         return result
 
     def delete(self, record: Union[dict, str]) -> Result:
