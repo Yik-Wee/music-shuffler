@@ -71,12 +71,16 @@ class YouTubeApi(PlatformApi):
         for item in items:
             all_thumbnails = item['snippet']['thumbnails']
             thumbnail = choose_thumbnail(all_thumbnails)
+            owner = item['snippet'].get('videoOwnerChannelTitle', '')
+            print(owner)
 
             track = {
                 'track_id': item['snippet']['resourceId']['videoId'],
                 'platform': self.platform,
                 'title': item['snippet']['title'],
-                'owner': item['snippet']['channelTitle'],
+                # deleted videos have title "Deleted video" and do not have
+                # certain fields like 'videoOwnerChannelTitle'
+                'owner': owner,
                 'thumbnail': thumbnail,
                 # getting duration of video requires another API call which would increase
                 # quota usage by n number of videos
@@ -102,12 +106,14 @@ class YouTubeApi(PlatformApi):
             for item in items:
                 all_thumbnails = item['snippet']['thumbnails']
                 thumbnail = choose_thumbnail(all_thumbnails)
+                owner = item['snippet'].get('videoOwnerChannelTitle', '')
+                print(owner)
 
                 track = {
-                    'track_id': item['id'],
+                    'track_id': item['snippet']['resourceId']['videoId'],
                     'platform': self.platform,
                     'title': item['snippet']['title'],
-                    'owner': item['snippet']['channelTitle'],
+                    'owner': owner,
                     'thumbnail': thumbnail,
                     # getting duration of video requires another API call which would increase
                     # quota usage by n number of videos
