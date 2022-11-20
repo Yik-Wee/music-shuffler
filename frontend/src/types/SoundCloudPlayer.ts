@@ -54,6 +54,19 @@ interface SoundCloudPlayer {
  * @param element Either the iframe element or the iframe ID
  * @returns {SoundCloudPlayer} The Widget instance that controls the soundcloud iframe player.
  */
-type WidgetConstructor = (element: HTMLIFrameElement | string) => SoundCloudPlayer;
+type WidgetType = {
+    (element: HTMLIFrameElement | string): SoundCloudPlayer,
+    Events: {
+        LOAD_PROGRESS: string,
+        PLAY_PROGRESS: string,
+        PLAY: string,
+        PAUSE: string,
+        FINISH: string,
+        SEEK: string,
+        READY: string,
+        ERROR: string,
+        // ...
+    }
+};
 
-export type { SoundCloudPlayer, WidgetConstructor };
+export type { SoundCloudPlayer, WidgetType as WidgetConstructor };

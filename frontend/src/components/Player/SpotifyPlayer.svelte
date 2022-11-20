@@ -1,16 +1,24 @@
 <script lang="ts">
-    import { containerIds, players } from '../../stores';
-    import { onMount } from 'svelte';
+    import { setPlayer, TrackQueue } from '../../stores';
+    import { createEventDispatcher, onMount, setContext } from 'svelte';
     import SpotifyPlayer from '../../types/SpotifyPlayer';
 
-    let player: SpotifyPlayer | undefined;
+    export let id: string | undefined = undefined;
+
+    let player: SpotifyPlayer;
+    let iframeId: string = 'spotify-player-iframe';
+
+    let dispatch = createEventDispatcher();
+
+    // setContext('spotify', {
+    //     getPlayer: () => player,
+    // });
 
     onMount(() => {
-        player = new SpotifyPlayer('spotify-player-iframe', {
+        player = new SpotifyPlayer(iframeId, {
             onEnded: (target: SpotifyPlayer) => {
                 console.log('spotify track ended');
-                // target.loadTrack(/*...*/);
-                // target.play();
+                TrackQueue.loadNext();
             },
             onReady: (target: SpotifyPlayer) => {
                 console.log('spotify track ready');
@@ -18,19 +26,25 @@
                 target.playTrack();
             }
         });
-        // spotifyPlayer.set(player);
-        players.spotify = player;
+
+        setPlayer('spotify', player);
+
+        dispatch('load', {
+            text: 'Spotify player loaded'
+        });
+        // players.spotify = player;
     });
 </script>
 
-<div id="{containerIds.spotify}">
+<div {id}>
     <iframe
-        id="spotify-player-iframe"
+        id={iframeId}
         title="insert title here"
-        src="https://open.spotify.com/embed/track/5NDAjPZGAlMz3PqyttrE2s"
         frameborder="0"
+        src="https://open.spotify.com/embed/track/"
     />
-    <!-- <script src="https://open.spotify.com/embed-podcast/iframe-api/v1" async></script> -->
-    <!-- <div id="spotify-iframe-api-container"></div>
-    <div id="embed-iframe" /> -->
 </div>
+<!-- src="https://open.spotify.com/embed/track/5NDAjPZGAlMz3PqyttrE2s" -->
+<!-- <script src="https://open.spotify.com/embed-podcast/iframe-api/v1" async></script> -->
+<!-- <div id="spotify-iframe-api-container"></div>
+<div id="embed-iframe" /> -->

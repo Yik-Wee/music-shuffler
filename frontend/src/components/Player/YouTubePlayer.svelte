@@ -1,23 +1,40 @@
 <!-- https://developers.google.com/youtube/iframe_api_reference -->
+
 <script lang="ts">
-    import { containerIds, players } from '../../stores';
     import {
         YouTubePlayerState,
         type YouTubePlayer,
         type YouTubePlayerEvent
     } from '../../types/YouTubePlayer';
-    import { onMount } from 'svelte';
+    import { createEventDispatcher, onMount, setContext } from 'svelte';
+    import { setPlayer, TrackQueue } from '../../stores';
 
-    let player: YouTubePlayer | undefined;
+    export let id: string | undefined = undefined;
+
+    let player: YouTubePlayer;
+    let playerId: string = 'youtube-player';
+
+    // setContext('youtube', {
+    //     getPlayer: () => player,
+    // });
+
+    let dispatch = createEventDispatcher();
 
     function onPlayerReady(event: YouTubePlayerEvent) {
-        // ...
         console.log('ready');
         event.target.playVideo();
     }
 
     function onPlayerStateChange(event: YouTubePlayerEvent) {
-        console.log(event.data, YouTubePlayerState[event.data]);
+        switch (event.data) {
+            case YouTubePlayerState.ENDED:
+                console.log('youtube video ended');
+                TrackQueue.loadNext();
+                break;
+            default:
+                console.log(event.data, YouTubePlayerState[event.data]);
+                break;
+        }
     }
 
     onMount(() => {
@@ -26,10 +43,11 @@
                 throw new Error('window.YT is undefined');
             }
 
-            player = new (window as any).YT.Player('youtube-player', {
+            player = new (window as any).YT.Player(playerId, {
                 height: '130',
                 width: '290',
-                videoId: 'gdZLi9oWNZg', // haha bts lol funny hehee ahaha
+                // videoId: 'gdZLi9oWNZg', // haha bts lol funny hehee ahaha
+                videoId: '',
                 // playerVars: {
                 //     playsinline: 1
                 // },
@@ -38,8 +56,13 @@
                     onStateChange: onPlayerStateChange
                 }
             });
-            // youtubePlayer.set(player);
-            players.youtube = player;
+
+            setPlayer('youtube', player);
+
+            // players.youtube = player;
+            dispatch('load', {
+                text: 'YouTube player loaded'
+            });
         }
 
         // @ts-ignore Property 'onYouTubeIframeAPIReady' does not exist on type 'Window & typeof globalThis'
@@ -54,7 +77,8 @@
     });
 </script>
 
-<div id="{containerIds.youtube}">
+<div {id}>
+    <!-- <script src="https://www.youtube.com/iframe_api" async></script> -->
     <div id="yt-iframe-api-container" />
-    <div id="youtube-player" />
+    <div id="{playerId}" />
 </div>

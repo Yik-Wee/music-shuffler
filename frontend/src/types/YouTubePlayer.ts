@@ -21,7 +21,7 @@ enum YouTubePlayerState {
     PLAYING,
     PAUSED,
     BUFFERING,
-    CUED,
+    CUED = 5,
 }
 
 type YouTubePlayerEvent = {

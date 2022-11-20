@@ -1,355 +1,266 @@
-// import { writable, type Writable } from 'svelte/store';
-import { writable, type Writable } from 'svelte/store';
-import type { Track } from './types/PlaylistTracks';
-import type { SoundCloudPlayer } from './types/SoundCloudPlayer';
-import type SpotifyPlayer from './types/SpotifyPlayer';
-import { YouTubePlayerState, type YouTubePlayer } from './types/YouTubePlayer';
-
-// export let youtubePlayer: Writable<YouTubePlayer | undefined> = writable(undefined);
-// export let spotifyPlayer: Writable<SpotifyPlayer | undefined> = writable(undefined);
-// export let soundcloudPlayer: Writable<SoundCloudPlayer | undefined> = writable(undefined);
-
-// ==========Players==========
-type RecentlyPlayed = {
-    platform: string;
-    trackId: string;
-    startSeconds?: number;
-};
-
-export function recentlyPlayed(): RecentlyPlayed | null {
-    // <platform>:<trackId>:<startSeconds | empty>
-    let parts = localStorage.getItem('recentlyPlayed')?.split(':');
-
-    if (!parts) {
-        return null;
-    }
-
-    if (parts.length !== 3) {
-        localStorage.removeItem('recentlyPlayed');
-        return null;
-    }
-
-    let startSeconds: number | undefined = parseInt(parts[2]);
-    if (isNaN(startSeconds)) {
-        startSeconds = undefined;
-    }
-
-    return {
-        platform: parts[0],
-        trackId: parts[1],
-        startSeconds
-    };
-}
+import type { PlaylistInfoResponse, Track } from "./types/PlaylistTracks";
+import type { SoundCloudPlayer } from "./types/SoundCloudPlayer";
+import type SpotifyPlayer from "./types/SpotifyPlayer";
+import { YouTubePlayerState, type YouTubePlayer } from "./types/YouTubePlayer";
 
 type Players = {
-    youtube: YouTubePlayer | undefined;
-    spotify: SpotifyPlayer | undefined;
-    soundcloud: SoundCloudPlayer | undefined;
-    controller: PlayerController | undefined;
-};
+    youtube: YouTubePlayer | undefined,
+    soundcloud: SoundCloudPlayer | undefined,
+    spotify: SpotifyPlayer | undefined,
+}
 
-export let players: Players = {
+let players: Players = {
     youtube: undefined,
-    spotify: undefined,
     soundcloud: undefined,
-    controller: undefined
+    spotify: undefined,
 };
 
-export const playerNames = ['youtube', 'spotify', 'soundcloud'];
-
-export const containerIds = {
-    youtube: 'youtube-player-container',
-    spotify: 'spotify-player-container',
-    soundcloud: 'soundcloud-player-container'
-};
-
-function setContainerHidden(id: string, hidden: boolean): void {
-    let container = document.getElementById(id);
-    if (container) {
-        container.hidden = hidden;
-        // container.setAttribute('display', hidden ? 'none' : 'initial');
-    }
+function setPlayer(key: string, player: any) {
+    players[key as keyof typeof players] = player;
 }
 
-interface Player {
-    load(trackId: string, start?: number): void;
-    play(): void;
-    pause(): void;
-    toggle(): void;
-    show(): void;
-    hide(): void;
+function getPlayer<T=YouTubePlayer | SoundCloudPlayer | SpotifyPlayer | undefined>(key: string): T {
+    return players[key as keyof typeof players] as T;
 }
 
-class YouTubePlayerWrapper implements Player {
-    load(trackId: string, start?: number | undefined): void {
-        players.youtube?.loadVideoById(trackId, start);
-    }
-
-    play(): void {
-        players.youtube?.playVideo();
-    }
-
-    pause(): void {
-        players.youtube?.pauseVideo();
-    }
-
-    toggle(): void {
-        if (players.youtube?.getPlayerState() === YouTubePlayerState.PAUSED) {
-            this.play();
-        } else {
-            this.pause();
-        }
-    }
-
-    show(): void {
-        setContainerHidden(containerIds.youtube, false);
-    }
-
-    hide(): void {
-        setContainerHidden(containerIds.youtube, true);
-    }
+function containerId(player: string): string {
+    let idPart = player.replaceAll(' ', '-');
+    return `${idPart}-player-container`;
 }
 
-class SpotifyPlayerWrapper implements Player {
-    load(trackId: string, start?: number | undefined): void {
-        players.spotify?.loadTrack(trackId);
+/**
+ * The namespace containing functions to control the track queue
+ */
+namespace TrackQueue {
+    type Queue = {
+        position: number,
+        tracklist: Track[],
+        playlists: PlaylistInfoResponse[],
     }
 
-    play(): void {
-        players.spotify?.playTrack();
+    let queue: Queue = {
+        position: 0,
+        tracklist: [],
+        playlists: [],
     }
 
-    pause(): void {
-        players.spotify?.pauseTrack();
+    /**
+     * Set/reset the queue to store the `tracklist` and `playlists` the tracks are from.
+     * @param tracklist The list of tracks stored in the queue
+     * @param playlists The playlists (and their respective PlaylistInfo) the tracks are from
+     */
+    export function setQueue(tracklist: Track[], playlists: PlaylistInfoResponse[]) {
+        queue.tracklist = tracklist;
+        queue.position = 0;
+        queue.playlists = playlists;
     }
 
-    toggle(): void {
-        if (players.spotify?.isPaused) {
-            this.play();
-        } else {
-            this.pause();
-        }
+    /**
+     * @returns {PlaylistInfoResponse[]} the `playlists` the tracks stored in the queue belong to
+     */
+    export function playlists(): PlaylistInfoResponse[] {
+        return queue.playlists;
     }
 
-    show(): void {
-        setContainerHidden(containerIds.spotify, false);
+    /**
+     * @returns {Track} the track currently being played in the queue
+     */
+    export function nowPlaying(): Track {
+        return queue.tracklist[queue.position];
     }
 
-    hide(): void {
-        setContainerHidden(containerIds.spotify, true);
-    }
-}
-
-class SoundCloudPlayerWrapper implements Player {
-    load(trackId: string, start?: number | undefined): void {
-        players.soundcloud?.load(`https://soundcloud.com/tracks/${trackId}`, { auto_play: true });
+    /**
+     * @returns {Track[]} the list of tracks stored in the queue
+     */
+    export function tracklist(): Track[] {
+        return queue.tracklist;
     }
 
-    play(): void {
-        players.soundcloud?.play();
-    }
-
-    pause(): void {
-        players.soundcloud?.pause();
-    }
-
-    toggle(): void {
-        players.soundcloud?.isPaused((paused) => {
-            if (paused) {
-                this.play();
-            } else {
-                this.pause();
-            }
-        });
-    }
-
-    show(): void {
-        setContainerHidden(containerIds.soundcloud, false);
-    }
-
-    hide(): void {
-        setContainerHidden(containerIds.soundcloud, true);
-    }
-}
-
-type Controllers = {
-    youtube: YouTubePlayerWrapper;
-    spotify: SpotifyPlayerWrapper;
-    soundcloud: SoundCloudPlayerWrapper;
-};
-
-export class PlayerController implements Player {
-    controllers: Controllers = {
-        youtube: new YouTubePlayerWrapper(),
-        spotify: new SpotifyPlayerWrapper(),
-        soundcloud: new SoundCloudPlayerWrapper()
-    };
-
-    key: string = 'youtube';
-
-    currentPlayer(): Player | undefined {
-        return this.controllers[this.key as keyof Controllers];
-    }
-
-    load(trackId: string, start?: number | undefined): void {
-        this.currentPlayer()?.load(trackId, start);
-    }
-
-    play(): void {
-        this.currentPlayer()?.play();
-    }
-
-    toggle(): void {
-        this.currentPlayer()?.toggle();
-    }
-
-    pause(): void {
-        this.currentPlayer()?.pause();
-    }
-
-    show(): void {
-        this.currentPlayer()?.show();
-    }
-
-    hide(): void {
-        this.currentPlayer()?.hide();
-    }
-
-    swapPlayer(name: string): void {
-        if (!Object.keys(this.controllers).includes(name)) return;
-
-        this.key = name;
-        this.show();
-        for (let key in this.controllers) {
-            if (key !== this.key) {
-                let p = this.controllers[key as keyof Controllers];
-                p.pause();
-                p.hide();
-            }
-        }
-    }
-
-    hideAll(): void {
-        for (let key in this.controllers) {
-            this.controllers[key as keyof Controllers].hide();
-        }
-    }
-}
-
-// ==========Now Playing (Track Queue)==========
-
-interface ITrackQueue {
-    // ...
-    position: number;
-    tracks: Track[];
-    shuffle(): void;
-    currentTrack(): Track;
-    length(): number;
-    play(): void;
-    pause(): void;
-    toggle(): void;
-    playNext(): void;
-    playPrev(): void;
-}
-
-class TrackQueue implements ITrackQueue {
-    private _position: number;
-    private _tracks: Track[];
-
-    constructor(tracks?: Track[]) {
-        this._tracks = tracks || [];
-
-        if (this.length() > 0) {
-            this._position = 0;
-            let track = this.currentTrack();
-            players.controller?.load(track.track_id);
-        } else {
-            this._position = -1;
-        }
-    }
-
-    public get position(): number {
-        return this._position;
-    }
-
-    private set position(value: number) {
-        if (value >= 0 && value < this.length()) {
-            this._position = value;
-        }
-    }
-
-    public get tracks(): Track[] {
-        return this._tracks;
-    }
-
-    public set tracks(value: Track[]) {
-        this.position = 0;
-        this._tracks = value;
-    }
-
-    shuffle(): void {
-        // 0 or 1 tracks is alr shuffled
-        if (this.length() <= 1) {
+    /**
+     * Shuffles the queue's tracklist, setting the track now playing to be the first track in the queue
+     */
+    export function shuffle() {
+        console.log('shuffle() start');
+        let n = queue.tracklist.length - 1;
+        if (n <= 0) {
             return;
         }
 
-        [this.tracks[0], this.tracks[this.position]] = [this.tracks[this.position], this.tracks[0]];
-        let n = this.length() - 1;
-        for (let i = 1; i < this.length(); i++) {
-            let r = Math.round(Math.random() * n);
-            [this.tracks[i], this.tracks[r]] = [this.tracks[r], this.tracks[i]];
+        // set current track to the first position
+        if (queue.position !== 0) {
+            let idx = queue.position;
+            [queue.tracklist[idx], queue.tracklist[0]] = [queue.tracklist[0], queue.tracklist[idx]];
+            queue.position = 0;
+        }
+
+        for (let i = n; i > 1; i--) {
+            let r = Math.floor(1 + (Math.random() * (i - 1)));
+            console.log(`swap ${i}, ${r}`);
+            [queue.tracklist[i], queue.tracklist[r]] = [queue.tracklist[r], queue.tracklist[i]];
+        }
+        console.log('shuffle() end');
+    }
+
+    /**
+     * Loads the track at the specified position in the tracklist
+     * @param position the position of the track in the tracklist
+     * @returns {boolean} `true` if loaded successfully, `false` otherwise
+     */
+    export function load(position: number): boolean {
+        console.log(`load(${position})`, queue);
+        if (position >= queue.tracklist.length || position < 0) {
+            return false;
+        }
+    
+        queue.position = position;
+        let track = nowPlaying();
+        let platform = track.platform.toLowerCase();
+        let player = getPlayer(platform);
+        switch (platform) {
+            case 'youtube':
+                (player as YouTubePlayer).loadVideoById(track.track_id);
+                break;
+            case 'soundcloud':
+                (player as SoundCloudPlayer).load(`https://api.soundcloud.com/tracks/${track.track_id}`, { auto_play: true });
+                break;
+            case 'spotify':
+                (player as SpotifyPlayer).loadTrack(track.track_id);
+                break;
+            default:
+                return false;
+        }
+        swap(platform);
+        return true;
+    }
+
+    /**
+     * Load the next track, relative to the current track playing
+     * @returns {boolean} `true` if loaded successfully, `false` otherwise
+     */
+    export function loadNext(): boolean {
+        return load(queue.position + 1);
+    }
+
+    /**
+     * Load the previous track, relative to the current track playing
+     * @returns {boolean} `true` if loaded successfully, `false` otherwise
+     */
+    export function loadPrev(): boolean {
+        return load(queue.position - 1);
+    }
+
+    /**
+     * Play the current track
+     */
+    export function play() {
+        let track = nowPlaying();
+        let platform = track.platform.toLowerCase();
+        let player = getPlayer(platform);
+
+        switch (platform) {
+            case 'youtube':
+                (player as YouTubePlayer).playVideo();
+                break;
+            case 'soundcloud':
+                (player as SoundCloudPlayer).play();
+                break;
+            case 'spotify':
+                (player as SpotifyPlayer).playTrack();
+                break;
         }
     }
 
-    currentTrack(): Track {
-        return this.tracks[this.position];
-    }
-
-    length(): number {
-        return this.tracks.length;
-    }
-
-    play(): void {
-        players.controller?.play();
-    }
-
-    pause(): void {
-        players.controller?.pause();
-    }
-
-    toggle(): void {
-        players.controller?.toggle();
-    }
-
-    playNext(): void {
-        if (this.lastTrackReached()) {
-            return;
+    /**
+     * Pause the current track
+     */
+    export function pause() {
+        let track = nowPlaying();
+        let platform = track.platform.toLowerCase();
+        let player = getPlayer(platform);
+        switch (platform) {
+            case 'youtube':
+                (player as YouTubePlayer).pauseVideo();
+                break;
+            case 'soundcloud':
+                (player as SoundCloudPlayer).pause();
+                break;
+            case 'spotify':
+                (player as SpotifyPlayer).pauseTrack();
+                break;
         }
-
-        this.position += 1;
-        let track = this.currentTrack();
-        players.controller?.load(track.track_id);
-        this.play();
     }
 
-    playPrev(): void {
-        if (this.firstTrackReached()) {
-            return;
+    /**
+     * @returns {boolean} `true` if track is playing, `false` otherwise
+     */
+    function isPlaying(): boolean {
+        let track = nowPlaying();
+        let platform = track.platform.toLowerCase();
+        let player = getPlayer(platform);
+        switch (platform) {
+            case 'youtube':
+                let state = (player as YouTubePlayer).getPlayerState();
+                return state === YouTubePlayerState.PLAYING;
+            case 'soundcloud':
+                let paused: boolean = true;
+                (player as SoundCloudPlayer).isPaused(isPaused => paused = isPaused);
+                return paused;
+            case 'spotify':
+                return !(player as SpotifyPlayer).isPaused;
+            default:
+                // platform is not supported (invalid) => that platform's player
+                // doesn't exist so it's not playing
+                return false;
         }
-
-        this.position -= 1;
-        let track = this.currentTrack();
-        players.controller?.load(track.track_id);
-        this.play();
     }
 
-    firstTrackReached(): boolean {
-        return this.position <= 0;
+    /**
+     * Toggles between play and pause on the current track
+     */
+    export function toggle() {
+        if (isPlaying()) {
+            pause();
+        } else {
+            play();
+        }
     }
 
-    lastTrackReached(): boolean {
-        return this.position >= this.length() - 1;
+    /**
+     * Swap to the specified player and `show()` it. `hide()`s and `pause()`s all other players
+     * @param player the name of the player, e.g. `youtube`, `spotify`, `soundcloud`
+     */
+    export function swap(player: string) {
+        show(player);
+        Object.keys(players).filter(key => key !== player).forEach(key => hide(key));
+    }
+
+    function setVisible(player: string, visible: boolean) {
+        let id = containerId(player);
+        let container = document.getElementById(id);
+        if (container) {
+            container.hidden = !visible;
+        }
+    }
+
+    /**
+     * Hide the specified player
+     * @param player the name of the player, as the key of `players`
+     */
+    function hide(player: string) {
+        setVisible(player, false);
+    }
+
+    export function hideAll() {
+        Object.keys(players).forEach(hide);
+    }
+
+    /**
+     * Show the specified player, making it visible
+     * @param player the name of the player, as the key of `players`
+     */
+    function show(player: string) {
+        setVisible(player, true);
     }
 }
 
-export let trackQueue: Writable<TrackQueue> = writable(new TrackQueue());
+export { setPlayer, getPlayer, containerId, TrackQueue };

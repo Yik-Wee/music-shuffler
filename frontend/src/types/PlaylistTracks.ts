@@ -10,7 +10,19 @@ export type Track = {
     duration_seconds?: number;
 };
 
-export type PlaylistResponse = {
+export type PlaylistResponse = PlaylistInfoResponse & {
+    // platform: string;
+    // playlist_id: string;
+    // title: string;
+    // owner: string;
+    // description: string;
+    // thumbnail: string;
+    // etag: string;
+    length: number;
+    tracks: Track[];
+};
+
+export type PlaylistInfoResponse = {
     platform: string;
     playlist_id: string;
     title: string;
@@ -18,14 +30,16 @@ export type PlaylistResponse = {
     description: string;
     thumbnail: string;
     etag: string;
-    length: number;
-    tracks: Track[];
-};
+}
 
 export type ErrorResponse = {
     error: string;
 };
 
-export function isErrorResponse(obj: PlaylistResponse | ErrorResponse): obj is ErrorResponse {
+export function isErrorResponse(obj: PlaylistResponse | PlaylistInfoResponse | ErrorResponse): obj is ErrorResponse {
     return (obj as ErrorResponse).error !== undefined;
+}
+
+export function toPlaylistInfo({ length, tracks, ...info }: PlaylistResponse): PlaylistInfoResponse {
+    return info;
 }

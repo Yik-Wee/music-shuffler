@@ -10,8 +10,8 @@
     }
 </script>
 
-<div id="search-bar">
-    <select name="platform" id="platform">
+<div id="search-bar" class:error="{isValid}">
+    <select name="platform" id="platform" bind:value={platform}>
         <option value="youtube">YouTube</option>
         <option value="spotify">Spotify</option>
         <option value="soundcloud">SoundCloud</option>
@@ -31,5 +31,16 @@
             }
         }}
     />
-    <a href="/{platform}/?id={encodeURIComponent(id)}" bind:this={search}>👌</a>
+    <!-- or use `goto()`? -->
+    <a href="/search?platform={platform}&id={encodeURIComponent(id)}" bind:this={search}>👌</a>
 </div>
+
+<style>
+    #search-bar.error > input {
+        border: red;
+    }
+
+    #search-bar.error > a {
+        pointer-events: none;
+    }
+</style>
