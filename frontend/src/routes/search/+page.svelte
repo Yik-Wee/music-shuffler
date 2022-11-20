@@ -7,6 +7,7 @@
     } from '../../types/PlaylistTracks';
     import { getPlaylistInfo } from '../../requests';
     import PlaylistCard from '../../components/PlaylistCard.svelte';
+    import { afterNavigate } from '$app/navigation';
 
     let id: string;
     let platform: string;
@@ -14,14 +15,15 @@
     let playlistInfo: PlaylistInfoResponse | undefined;
     let link: HTMLAnchorElement;
 
-    onMount(async () => {
+    async function update() {
         id = $page.url.searchParams.get('id')?.trim() || '';
+        platform = $page.url.searchParams.get('platform')?.trim() || '';
+
         if (!id) {
             err = 'No id specified';
             return;
         }
 
-        platform = $page.url.searchParams.get('platform')?.trim() || '';
         if (!platform) {
             err = 'No platform specified';
             return;
@@ -34,9 +36,14 @@
         } else {
             playlistInfo = res;
         }
-    });
-</script>
+    }
 
+    // onMount for Server Side Routed page load
+    onMount(update);
+
+    // afterNavigate for Client Side Routed page load
+    afterNavigate(update);
+</script>
 
 <div>
     <h1>{platform}</h1>
