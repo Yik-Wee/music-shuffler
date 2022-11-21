@@ -1,10 +1,7 @@
 <script type="ts">
     import { page } from '$app/stores';
     import { onMount } from 'svelte';
-    import {
-        isErrorResponse,
-        type PlaylistInfoResponse,
-    } from '../../types/PlaylistTracks';
+    import { isErrorResponse, type PlaylistInfoResponse } from '../../types/PlaylistTracks';
     import { getPlaylistInfo } from '../../requests';
     import PlaylistCard from '../../components/PlaylistCard.svelte';
     import { afterNavigate } from '$app/navigation';
@@ -43,6 +40,9 @@
 
     // afterNavigate for Client Side Routed page load
     afterNavigate(update);
+
+    /** height of the PlaylistCard in px */
+    let height: number = 240;
 </script>
 
 <div>
@@ -58,7 +58,13 @@
     {/if}
 
     {#if playlistInfo}
-        <PlaylistCard {...playlistInfo} on:click={() => link.click()} />
+        <PlaylistCard
+            {...playlistInfo}
+            --width="75%"
+            --height="{height}px"
+            --thumbnail-height="{0.6 * height}px"
+            on:click={() => link.click()}
+        />
         <a href="/playlist/{platform}?id={id}" bind:this={link}>Play</a>
     {/if}
 </div>

@@ -1,7 +1,7 @@
 <script lang="ts">
-    import type { Track } from '../../types/PlaylistTracks';
-    import TrackList from '../../components/TrackList.svelte';
-    import { TrackQueue } from '../../stores';
+    import type { Track } from '../../../types/PlaylistTracks';
+    import TrackList from '../../../components/TrackList.svelte';
+    import { TrackQueue } from '../../../stores';
 
     let tracklist: Track[] = [
         {

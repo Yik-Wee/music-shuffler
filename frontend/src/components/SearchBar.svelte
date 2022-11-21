@@ -6,7 +6,7 @@
 
     function validate(id: string): boolean {
         // ...
-        return (id !== '' && !id.includes(' '));
+        return id !== '' && !id.includes(' ');
     }
 </script>
 
@@ -51,14 +51,15 @@
         transition: all 100ms ease-in-out;
     }
 
-    #platform:hover, #platform:focus {
+    #platform:hover,
+    #platform:focus {
         border-bottom: 2px solid blue;
     }
 
     #search-bar {
         display: flex;
         flex-direction: row;
-        column-gap: .5rem;
+        column-gap: 0.5rem;
     }
 
     #search-bar > input {
@@ -69,11 +70,13 @@
         transition: all 200ms ease-in-out;
     }
 
-    #search-bar > input:focus, #search-bar > input:hover {
+    #search-bar > input:focus,
+    #search-bar > input:hover {
         border-bottom: 2px solid blue;
     }
 
-    #search-bar.error > input:focus, #search-bar.error > input:hover  {
+    #search-bar.error > input:focus,
+    #search-bar.error > input:hover {
         border-bottom: 2px solid red;
     }
 

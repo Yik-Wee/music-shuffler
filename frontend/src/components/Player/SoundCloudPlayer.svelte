@@ -1,8 +1,8 @@
 <!-- https://developers.soundcloud.com/docs/api/html5-widget -->
 <script lang="ts">
-    import type { SoundCloudPlayer, WidgetType } from "../../types/SoundCloudPlayer";
-    import { createEventDispatcher, onMount, setContext } from "svelte";
-    import { setPlayer, TrackQueue } from "../../stores";
+    import type { SoundCloudPlayer, WidgetType } from '../../types/SoundCloudPlayer';
+    import { createEventDispatcher, onMount, setContext } from 'svelte';
+    import { setPlayer, TrackQueue } from '../../stores';
 
     export let id: string | undefined = undefined;
 
@@ -11,15 +11,13 @@
 
     let dispatch = createEventDispatcher();
 
-    // setContext('soundcloud', {
-    //     getPlayer: () => player,
-    // });
-
     onMount(() => {
         // @ts-ignore
         let Widget: WidgetType = window.SC.Widget;
         player = Widget(iframeId);
-        player.bind(Widget.Events.READY, () => { player.play() });
+        player.bind(Widget.Events.READY, () => {
+            player.play();
+        });
         player.bind(Widget.Events.FINISH, () => {
             TrackQueue.loadNext();
         });

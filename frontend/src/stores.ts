@@ -1,25 +1,29 @@
-import type { PlaylistInfoResponse, Track } from "./types/PlaylistTracks";
-import { type SoundCloudPlayer, scGet } from "./types/SoundCloudPlayer";
-import type SpotifyPlayer from "./types/SpotifyPlayer";
-import { YouTubePlayerState, type YouTubePlayer } from "./types/YouTubePlayer";
+import type { PlaylistInfoResponse, Track } from './types/PlaylistTracks';
+import { type SoundCloudPlayer, scGet } from './types/SoundCloudPlayer';
+import type SpotifyPlayer from './types/SpotifyPlayer';
+import { YouTubePlayerState, type YouTubePlayer } from './types/YouTubePlayer';
 
 type Players = {
-    youtube: YouTubePlayer | undefined,
-    soundcloud: SoundCloudPlayer | undefined,
-    spotify: SpotifyPlayer | undefined,
-}
+    youtube: YouTubePlayer | undefined;
+    soundcloud: SoundCloudPlayer | undefined;
+    spotify: SpotifyPlayer | undefined;
+};
 
 let players: Players = {
     youtube: undefined,
     soundcloud: undefined,
-    spotify: undefined,
+    spotify: undefined
 };
+
+let supportedPlatforms = Object.keys(players);
 
 function setPlayer(key: string, player: any) {
     players[key as keyof typeof players] = player;
 }
 
-function getPlayer<T=YouTubePlayer | SoundCloudPlayer | SpotifyPlayer | undefined>(key: string): T {
+function getPlayer<T = YouTubePlayer | SoundCloudPlayer | SpotifyPlayer | undefined>(
+    key: string
+): T {
     return players[key as keyof typeof players] as T;
 }
 
@@ -33,16 +37,16 @@ function containerId(player: string): string {
  */
 namespace TrackQueue {
     type Queue = {
-        position: number,
-        tracklist: Track[],
-        playlists: PlaylistInfoResponse[],
-    }
+        position: number;
+        tracklist: Track[];
+        playlists: PlaylistInfoResponse[];
+    };
 
     let queue: Queue = {
         position: 0,
         tracklist: [],
-        playlists: [],
-    }
+        playlists: []
+    };
 
     /**
      * Set/reset the queue to store the `tracklist` and `playlists` the tracks are from.
@@ -94,7 +98,7 @@ namespace TrackQueue {
         }
 
         for (let i = n; i > 1; i--) {
-            let r = Math.floor(1 + (Math.random() * (i - 1)));
+            let r = Math.floor(1 + Math.random() * (i - 1));
             console.log(`swap ${i}, ${r}`);
             [queue.tracklist[i], queue.tracklist[r]] = [queue.tracklist[r], queue.tracklist[i]];
         }
@@ -114,7 +118,7 @@ namespace TrackQueue {
 
         // pause the current track if the next track is playing in a different player
         pause();
-    
+
         queue.position = position;
         let track = nowPlaying();
         let platform = track.platform.toLowerCase();
@@ -124,7 +128,10 @@ namespace TrackQueue {
                 (player as YouTubePlayer).loadVideoById(track.track_id);
                 break;
             case 'soundcloud':
-                (player as SoundCloudPlayer).load(`https://api.soundcloud.com/tracks/${track.track_id}`, { auto_play: true });
+                (player as SoundCloudPlayer).load(
+                    `https://api.soundcloud.com/tracks/${track.track_id}`,
+                    { auto_play: true }
+                );
                 break;
             case 'spotify':
                 (player as SpotifyPlayer).loadTrack(track.track_id);
@@ -205,7 +212,7 @@ namespace TrackQueue {
                 let state = (player as YouTubePlayer).getPlayerState();
                 return state === YouTubePlayerState.PLAYING;
             case 'soundcloud':
-                let playing = ! await scGet((player as SoundCloudPlayer).isPaused.bind(player));
+                let playing = !(await scGet((player as SoundCloudPlayer).isPaused.bind(player)));
                 return playing;
             case 'spotify':
                 return !(player as SpotifyPlayer).isPaused;
@@ -236,7 +243,9 @@ namespace TrackQueue {
      */
     export function swap(player: string) {
         show(player);
-        Object.keys(players).filter(key => key !== player).forEach(key => hide(key));
+        Object.keys(players)
+            .filter((key) => key !== player)
+            .forEach((key) => hide(key));
     }
 
     function setVisible(player: string, visible: boolean) {
@@ -268,4 +277,4 @@ namespace TrackQueue {
     }
 }
 
-export { setPlayer, getPlayer, containerId, TrackQueue };
+export { supportedPlatforms, setPlayer, getPlayer, containerId, TrackQueue };

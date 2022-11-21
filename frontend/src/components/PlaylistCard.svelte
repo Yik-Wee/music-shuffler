@@ -1,14 +1,90 @@
+<!-- @component
+# Styling
+* `--width`: width of the card
+* `--height`: height of the card
+* `--lines`: number of lines on `title` and `owner` text until it overflows into ellipsis
+
+# Props
+* `title`: title of the playlist
+* `owner`: the owner of the playlist
+* `thumbnail`: the playlist's thumbnail. Set to empty string `''` by default if no thumbnail
+
+# Events
+* `on:click`: called when the card is clicked
+ -->
 <script lang="ts">
     export let title: string;
-    export let thumbnail: string;
     export let owner: string;
+    export let thumbnail: string = '';
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<div on:click>
-    {#if thumbnail}
-        <img src="{thumbnail}" alt="{title} by {owner}">
-    {/if}
-    <p>Title: {title}</p>
-    <p>Owner: {owner}</p>
+<div class="playlist-card" on:click>
+    <div class="playlist-card-thumbnail">
+        {#if thumbnail}
+            <img src={thumbnail} alt="{title} by {owner}" />
+        {/if}
+    </div>
+    <div class="playlist-card-text-big">
+        <span>{title}</span>
+    </div>
+    <div class="playlist-card-text-small">
+        <span>{owner}</span>
+    </div>
 </div>
+
+<style>
+    :root {
+        --width: 120px;
+        --height: 220px;
+        --lines: 3;
+        --thumbnail-width: auto;
+        --thumbnail-height: calc(0.4 * var(--height));
+    }
+
+    .playlist-card {
+        padding: 1%;
+        border-radius: 4px;
+        width: var(--width);
+        height: var(--height);
+        background: whitesmoke;
+        overflow: hidden;
+        cursor: pointer;
+        grid-template-rows: [thumbnail] var(--thumbnail-height) [title] 2fr [owner] 1fr;
+        transition: background 75ms ease-in;
+    }
+
+    .playlist-card:hover {
+        background: salmon;
+    }
+
+    .playlist-card > .playlist-card-text-big,
+    .playlist-card > .playlist-card-text-small {
+        text-align: center;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: var(--lines);
+        -webkit-box-orient: vertical;
+    }
+
+    .playlist-card > .playlist-card-text-big {
+        font-size: large;
+    }
+
+    .playlist-card > .playlist-card-text-small {
+        font-size: smaller;
+        color: grey;
+    }
+
+    .playlist-card > .playlist-card-thumbnail {
+        display: flex;
+        justify-content: center;
+    }
+
+    .playlist-card > .playlist-card-thumbnail > img {
+        border-radius: 4px;
+        max-width: var(--thumbnail-width);
+        max-height: var(--thumbnail-height);
+    }
+</style>

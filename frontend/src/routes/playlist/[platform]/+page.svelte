@@ -8,7 +8,6 @@
         type PlaylistResponse,
     } from '../../../types/PlaylistTracks';
     import { getPlaylist } from '../../../requests';
-    import Track from '../../../components/Track.svelte';
     import { TrackQueue } from '../../../stores';
     import TrackList from '../../../components/TrackList.svelte';
 
@@ -51,8 +50,6 @@
         {#if err}
             <div>{err}</div>
         {/if}
-
-        <div>(Debug) PlaylistID: {id}</div>
     {:else}
         <div>Search for a {data.platform} playlist with it's playlist ID!</div>
     {/if}
@@ -70,6 +67,43 @@
                 class="playlist-thumbnail"
             />
         </div>
+
+        <button on:click={() => {
+            if (!playlist) {
+                return;
+            }
+
+            // save playlist to localStorage
+            let savedRaw = localStorage.getItem('savedPlaylists');
+            if (!savedRaw) {
+                localStorage.setItem('savedPlaylists', `[${playlist.playlist_id}]`);
+                return;
+            }
+
+            // check if this playlist alr saved
+            let saved;
+            try {
+                saved = JSON.parse(savedRaw);
+            } catch (err) {
+                // json decode error => overwrite savedPlaylists
+                localStorage.setItem('savedPlaylists', `[${playlist.playlist_id}]`);
+                return;
+            }
+
+            if (!(Array.isArray(saved))) {
+                localStorage.setItem('savedPlaylists', `[${playlist.playlist_id}]`);
+                return;
+            }
+
+            let item = `${data.platform}:${playlist.playlist_id}`;
+            if (saved.includes(item)) {
+                console.log('Playlist already saved to library');
+                return;
+            };
+
+            saved.push(item);
+            localStorage.setItem('savedPlaylists', JSON.stringify(saved));
+        }}>Save playlist</button>
 
         <a href="/queue" on:click={() => {
             setQueueIfQueueDiff();

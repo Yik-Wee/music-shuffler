@@ -38,7 +38,8 @@
         src: url('/fonts/VarelaRound/VarelaRound-Regular.ttf');
     }
 
-    :root, :global(input, textarea, button, option, select) {
+    :root,
+    :global(input, textarea, button, option, select) {
         font-family: 'Varela';
         font-size: 13px;
     }

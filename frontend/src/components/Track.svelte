@@ -9,17 +9,19 @@
     export let position: number;
 
     // duration in min:ss
-    let durationString: string = duration_seconds ? `${Math.floor(duration_seconds / 60)}:${duration_seconds % 60}` : '';
+    let durationString: string = duration_seconds
+        ? `${Math.floor(duration_seconds / 60)}:${duration_seconds % 60}`
+        : '';
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<div class="track" data-track-id="{track_id}" data-track-platform="{platform}" on:click>
+<div class="track" data-track-id={track_id} data-track-platform={platform} on:click>
     <div class="track-position">
         {position}
     </div>
     <div class="track-thumbnail">
         {#if thumbnail}
-            <img src="{thumbnail}" alt="{title} by {owner}" width="40px">
+            <img src={thumbnail} alt="{title} by {owner}" width="40px" />
         {/if}
     </div>
     <div class="track-title">
@@ -42,7 +44,7 @@
         column-gap: 8px;
         display: grid;
         padding: 0 16px;
-        grid-template-columns: [index] 8px [first] 40px [var1] 2.75fr [var2] 1.75fr [last] .25fr;
+        grid-template-columns: [index] 8px [first] 40px [var1] 2.75fr [var2] 1.75fr [last] 0.25fr;
         align-items: center;
         background-color: whitesmoke;
         cursor: pointer;
@@ -54,7 +56,8 @@
     }
 
     /* TODO wrap 2 lines then ellipses */
-    .track > .track-title, .track > .track-owner {
+    .track > .track-title,
+    .track > .track-owner {
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;

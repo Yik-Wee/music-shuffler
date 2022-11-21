@@ -1,8 +1,8 @@
 <!-- used to render a track list -->
 <script lang="ts">
-    import { TrackQueue } from "../stores";
-    import type { Track as TrackType } from "../types/PlaylistTracks";
-    import Track from "./Track.svelte";
+    import { TrackQueue } from '../stores';
+    import type { Track as TrackType } from '../types/PlaylistTracks';
+    import Track from './Track.svelte';
 
     export let tracklist: TrackType[];
     /** The message to display if the tracklist is empty */
@@ -15,7 +15,7 @@
     {#if tracklist}
         <div class="tracklist-headers">
             <div>#</div>
-            <div></div>
+            <div />
             <div>Title</div>
             <div>Owner</div>
             <div>🕒</div>
@@ -23,13 +23,17 @@
     {/if}
 
     {#each tracklist as track, position}
-        <Track {...track} {position} on:click={() => {
-            if (trackclick) {
-                trackclick();
-            }
-            TrackQueue.load(position);
-            TrackQueue.play();
-        }} />
+        <Track
+            {...track}
+            {position}
+            on:click={() => {
+                if (trackclick) {
+                    trackclick();
+                }
+                TrackQueue.load(position);
+                TrackQueue.play();
+            }}
+        />
     {:else}
         <p>{ifempty}</p>
     {/each}
@@ -49,7 +53,7 @@
         column-gap: 8px;
         display: grid;
         padding: 0 16px;
-        grid-template-columns: [index] 8px [first] 40px [var1] 2.75fr [var2] 1.75fr [last] .25fr;
+        grid-template-columns: [index] 8px [first] 40px [var1] 2.75fr [var2] 1.75fr [last] 0.25fr;
         align-items: center;
         background-color: lightpink;
         transition: background-color 100ms ease-in;

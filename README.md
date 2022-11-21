@@ -1,4 +1,5 @@
 # TODO
+- [ ] Deal with unavailable youtube videos e.g. countdown, skip in 5s or something
 - [ ] Finish `SpotifyApi` and test it
 - [ ] Finish `SoundCloudApi` and test it
 - [ ] Add `/library` route: caching **playlist IDs** and mixes (`playlistID[]`) in `localStorage` -> `fetch` title, owner & length from API endpoint
