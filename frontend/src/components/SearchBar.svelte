@@ -44,6 +44,17 @@
 </div>
 
 <style>
+    #platform {
+        border: 0;
+        outline: 0;
+        border-bottom: 2px solid lightskyblue;
+        transition: all 100ms ease-in-out;
+    }
+
+    #platform:hover, #platform:focus {
+        border-bottom: 2px solid blue;
+    }
+
     #search-bar {
         display: flex;
         flex-direction: row;
@@ -58,11 +69,11 @@
         transition: all 200ms ease-in-out;
     }
 
-    #search-bar > input:focus {
+    #search-bar > input:focus, #search-bar > input:hover {
         border-bottom: 2px solid blue;
     }
 
-    #search-bar.error > input:focus {
+    #search-bar.error > input:focus, #search-bar.error > input:hover  {
         border-bottom: 2px solid red;
     }
 

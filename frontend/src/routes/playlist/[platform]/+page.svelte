@@ -10,6 +10,7 @@
     import { getPlaylist } from '../../../requests';
     import Track from '../../../components/Track.svelte';
     import { TrackQueue } from '../../../stores';
+    import TrackList from '../../../components/TrackList.svelte';
 
     export let data: PageData;
     let id: string;
@@ -17,7 +18,18 @@
     // let playlistInfo: PlaylistInfoResponse | undefined;
     let playlist: PlaylistResponse | undefined;
 
-    
+    function isNotAlreadyInQueue(): boolean {
+        let queueIds = TrackQueue.playlists().map(p => p.playlist_id);
+        return queueIds.length !== 1 || queueIds[0] !== id;
+    }
+
+    function setQueueIfQueueDiff() {
+        if (isNotAlreadyInQueue() && playlist) {
+            // set current playlist to play in queue
+            TrackQueue.setQueue(playlist.tracks, [toPlaylistInfo(playlist)]);
+        }
+    }
+
     onMount(async () => {
         id = $page.url.searchParams.get('id') || '';
 
@@ -60,37 +72,9 @@
         </div>
 
         <a href="/queue" on:click={() => {
-            if (!playlist) {
-                return;
-            }
-
-            // check if current playlist already playing in queue
-            let queueIds = TrackQueue.playlists().map(p => p.playlist_id);
-            if (queueIds.length !== 1 || queueIds[0] !== id) {
-                // set current playlist to play in queue
-                TrackQueue.setQueue(playlist.tracks, [toPlaylistInfo(playlist)]);
-            }
+            setQueueIfQueueDiff();
         }}>Shuffle in queue</a>
 
-        {#each playlist.tracks as track, position}
-            <Track {...track} on:click={() => {
-                if (!playlist) {
-                    return;
-                }
-
-                // check if current playlist already playing in queue
-                let queueIds = TrackQueue.playlists().map(p => p.playlist_id);
-                if (queueIds.length !== 1 || queueIds[0] !== id) {
-                    // set current playlist to play in queue
-                    TrackQueue.setQueue(playlist.tracks, [toPlaylistInfo(playlist)]);
-                }
-
-                // play the track
-                TrackQueue.load(position)
-                TrackQueue.play();
-            }} />
-        {:else}
-            <p>Playlist is empty</p>
-        {/each}
+        <TrackList tracklist={playlist.tracks} ifempty="Playlist is empty" trackclick={setQueueIfQueueDiff} />
     {/if}
 </div>

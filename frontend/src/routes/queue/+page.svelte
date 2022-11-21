@@ -1,6 +1,7 @@
 <script lang="ts">
     import { TrackQueue } from "../../stores";
     import Track from "../../components/Track.svelte";
+    import TrackList from "../../components/TrackList.svelte";
 
     let tracklist = TrackQueue.tracklist();
 </script>
@@ -26,12 +27,5 @@
         console.log(tracklist.map(({ title }) => title));
     }}>Shuffle</button>
 
-    {#each tracklist as track, position}
-        <Track {...track} on:click={() => {
-            TrackQueue.load(position);
-            TrackQueue.play();
-        }}/>
-    {:else}
-        <h1>No tracks in the queue</h1>
-    {/each}
+    <TrackList {tracklist} ifempty="Queue is empty" />
 </div>

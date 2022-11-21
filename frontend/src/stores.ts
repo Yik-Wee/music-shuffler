@@ -111,6 +111,9 @@ namespace TrackQueue {
         if (position >= queue.tracklist.length || position < 0) {
             return false;
         }
+
+        // pause the current track if the next track is playing in a different player
+        pause();
     
         queue.position = position;
         let track = nowPlaying();
