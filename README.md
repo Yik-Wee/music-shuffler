@@ -1,5 +1,6 @@
 # TODO
 - [x] Fix `SearchBar`
+- [ ] Fix soundcloudplayer `.play()` not playing
 - [ ] Finish `SpotifyApi` and test it
 - [ ] Finish `SoundCloudApi` and test it
 - [ ] Add `/library` route: caching **playlist IDs** and mixes (`playlistID[]`) in `localStorage` -> `fetch` title, owner & length from API endpoint
