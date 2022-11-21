@@ -1,5 +1,5 @@
 import type { PlaylistInfoResponse, Track } from "./types/PlaylistTracks";
-import type { SoundCloudPlayer } from "./types/SoundCloudPlayer";
+import { type SoundCloudPlayer, scGet } from "./types/SoundCloudPlayer";
 import type SpotifyPlayer from "./types/SpotifyPlayer";
 import { YouTubePlayerState, type YouTubePlayer } from "./types/YouTubePlayer";
 
@@ -196,7 +196,7 @@ namespace TrackQueue {
     /**
      * @returns {boolean} `true` if track is playing, `false` otherwise
      */
-    function isPlaying(): boolean {
+    async function isPlaying(): Promise<boolean> {
         let track = nowPlaying();
         let platform = track.platform.toLowerCase();
         let player = getPlayer(platform);
@@ -205,9 +205,8 @@ namespace TrackQueue {
                 let state = (player as YouTubePlayer).getPlayerState();
                 return state === YouTubePlayerState.PLAYING;
             case 'soundcloud':
-                let paused: boolean = true;
-                (player as SoundCloudPlayer).isPaused(isPaused => paused = isPaused);
-                return paused;
+                let playing = ! await scGet((player as SoundCloudPlayer).isPaused.bind(player));
+                return playing;
             case 'spotify':
                 return !(player as SpotifyPlayer).isPaused;
             default:
@@ -220,10 +219,13 @@ namespace TrackQueue {
     /**
      * Toggles between play and pause on the current track
      */
-    export function toggle() {
-        if (isPlaying()) {
+    export async function toggle() {
+        console.log(await isPlaying());
+        if (await isPlaying()) {
+            console.log('toggle pause()');
             pause();
         } else {
+            console.log('toggle play()');
             play();
         }
     }

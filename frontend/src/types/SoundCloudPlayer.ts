@@ -55,18 +55,40 @@ interface SoundCloudPlayer {
  * @returns {SoundCloudPlayer} The Widget instance that controls the soundcloud iframe player.
  */
 type WidgetType = {
-    (element: HTMLIFrameElement | string): SoundCloudPlayer,
+    (element: HTMLIFrameElement | string): SoundCloudPlayer;
     Events: {
-        LOAD_PROGRESS: string,
-        PLAY_PROGRESS: string,
-        PLAY: string,
-        PAUSE: string,
-        FINISH: string,
-        SEEK: string,
-        READY: string,
-        ERROR: string,
+        LOAD_PROGRESS: string;
+        PLAY_PROGRESS: string;
+        PLAY: string;
+        PAUSE: string;
+        FINISH: string;
+        SEEK: string;
+        READY: string;
+        ERROR: string;
         // ...
-    }
+    };
 };
 
-export type { SoundCloudPlayer, WidgetType as WidgetConstructor };
+/**
+ * Gets the attribute of the SoundCloud player instance using it's synchronous getter method. This is needed
+ * e.g. to return the attribute value from a function as the getter methods call the callback asynchronously.
+ * @param playerGetter the async getter method of the SoundCloud widget. Must be `bind()`ed to the `player` instance
+ * @returns 
+ * 
+ * # Example
+ * ```ts
+ * let player: SoundCloudPlayer = ...;
+ * let isPaused = await scGet(player.isPaused.bind(player));
+ * ```
+ */
+async function scGet<T>(playerGetter: (callback: (v: T) => void) => void): Promise<T> {
+    let promise: Promise<T> = new Promise((resolve, reject) => {
+        playerGetter((v) => {
+            resolve(v);
+        });
+    });
+    return promise;
+}
+
+export type { SoundCloudPlayer, WidgetType };
+export { scGet };
