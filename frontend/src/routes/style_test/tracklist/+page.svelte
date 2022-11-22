@@ -33,6 +33,14 @@
             owner: 'Shogonodo',
             thumbnail: 'https://i1.sndcdn.com/artworks-wD4JohKo1P1NnscC-0N1Axg-t500x500.jpg',
             duration_seconds: 160,
+        },
+        {
+            track_id: 'test',
+            platform: 'YOUTUBE',
+            title: 'buh '.repeat(20),
+            owner: 'バー'.repeat(20),
+            thumbnail: 'https://i1.sndcdn.com/artworks-wD4JohKo1P1NnscC-0N1Axg-t500x500.jpg',
+            duration_seconds: (60 * ((60 * ((24 * (365 + 2)) + 3)) + 4)) + 5,  // 1 year, 2 days, 3 hours, 4 mins, 5 secs
         }
     ];
 
