@@ -4,7 +4,7 @@
     import { isErrorResponse, type PlaylistInfoResponse } from '../../types/PlaylistTracks';
     import { getPlaylistInfo } from '../../requests';
     import PlaylistCard from '../../components/PlaylistCard.svelte';
-    import { afterNavigate } from '$app/navigation';
+    import { afterNavigate, goto } from '$app/navigation';
 
     let id: string;
     let platform: string;
@@ -63,8 +63,8 @@
             --width="75%"
             --height="{height}px"
             --thumbnail-height="{0.6 * height}px"
-            on:click={() => link.click()}
+            on:click={() => goto(`/playlist/${platform}?id=${id}`)}
         />
-        <a href="/playlist/{platform}?id={id}" bind:this={link}>Play</a>
+        <!-- <a href="/playlist/{platform}?id={id}" bind:this={link}>Play</a> -->
     {/if}
 </div>
