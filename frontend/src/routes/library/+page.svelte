@@ -1,86 +1,78 @@
-<!-- <script lang="ts">
+<script lang="ts">
+    import { getSaved, getSavedMixes, getSavedPlaylists, save, type Library } from "../../library";
     import { onMount } from "svelte";
     import PlaylistCard from "../../components/PlaylistCard.svelte";
-    import { getPlaylistInfo } from "../../requests";
-    import { supportedPlatforms } from "../../stores";
-    import { isErrorResponse, type ErrorResponse, type PlaylistInfoResponse } from "../../types/PlaylistTracks";
 
-    type PlaylistEntry = [string, string];
-
-    function isStringArray(arr: any[]): arr is string[] {
-        return arr.some(v => typeof v !== 'string' && !(v instanceof String));
-    }
-
-    function getSavedPlaylistIdsPlatforms(savedRaw: string | null): PlaylistEntry[] | null {
-        if (!savedRaw) {
-            return null;
-        }
-
-        let saved;
-        try {
-            saved = JSON.parse(savedRaw);
-        } catch (err) {
-            return null;
-        }
-
-        if (!Array.isArray(saved)) {
-            return null;
-        }
-
-        if (!isStringArray(saved)) {
-            return null;
-        }
-
-        let validEntries = saved.filter((v, i) => {
-            let pair = v.split(':');
-            if (pair && pair.length !== 2) {
-                return false;
-            }
-
-            let [platform, playlistId] = pair;
-            if (!platform || !playlistId || !supportedPlatforms.includes(platform)) {
-                return false;
-            }
-
-            return true;
-        }).map(x => (x.split(':') as PlaylistEntry));
-
-        return validEntries;
-    }
-
-    /**
-     * Get saved playlists and playlist mixes
-     */
-    async function getSaved(): Promise<PlaylistInfoResponse[]> {
-        // get saved playlists
-        let savedRaw = localStorage.getItem('savedPlaylists');
-        let saved = getSavedPlaylistIdsPlatforms(savedRaw);
-
-        // get saved mixes
-        // ...
-
-        if (saved) {
-            let responses: (PlaylistInfoResponse | ErrorResponse)[] = await Promise.all(
-                saved.map(([platform, id]) => getPlaylistInfo(platform, id))
-            );
-
-            let allInfos = responses.filter(function (res): res is PlaylistInfoResponse {
-                return !isErrorResponse(res);
-            });
-            return allInfos;
-        }
-        return [];
-    }
-
-    let library: PlaylistInfoResponse[];
+    let lib: Library;
 
     onMount(async () => {
-        library = await getSaved();
+        // ======testing code======
+        // save({
+        //     id: 'MIX-01',
+        //     title: 'Test Mix',
+        //     playlists: [
+        //         {
+        //             id: 'TEST-YT-01',
+        //             platform: 'youtube',
+        //         },
+        //         {
+        //             id: 'TEST-SC-01',
+        //             platform: 'soundcloud',
+        //         },
+        //         {
+        //             id: 'TEST-SP-01',
+        //             platform: 'spotify',
+        //         }
+        //     ]
+        // });
+        // save({
+        //     id: 'PLUQKJP1sVuNMvxOYqmdyOkE8Ryd_AWbQT',
+        //     platform: 'youtube',
+        // });
+        // save({
+        //     id: 'PL7IgabZ8nkx39Pl2SEMXTGfMnF8PwIYQo',
+        //     platform: 'youtube',
+        // });
+        // save({
+        //     id: 'TEST-SC-01',
+        //     platform: 'soundcloud',
+        // })
+        // save({
+        //     id: 'TEST-SP-01',
+        //     platform: 'spotify',
+        // })
+        // ======
+
+        lib = await getSaved();
+        console.log(lib);
     });
 </script>
 
-<div>
-    {#each library as info}
-        <PlaylistCard {...info} />
-    {/each}
-</div> -->
+<div class="library">
+    {#if lib}
+        <h1>Saved Playlists</h1>
+        <div class="library-area">
+            {#each lib.playlists as playlistInfo}
+                <PlaylistCard {...playlistInfo} />
+            {/each}
+        </div>
+
+        <h1>Saved Mixes</h1>
+        <div class="library-area">
+            {#each lib.mixes as mixInfo}
+                <PlaylistCard title={mixInfo.title} owner='Me' thumbnail='/assets/jammies.gif' />
+            {/each}
+        </div>
+    {:else}
+        <h1>Loading...</h1>
+    {/if}
+</div>
+
+<style>
+    .library > .library-area {
+        flex-wrap: wrap;
+        display: flex;
+        row-gap: 10px;
+        column-gap: 10px;
+    }
+</style>
