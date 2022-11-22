@@ -172,5 +172,5 @@ async function getSaved(): Promise<Library> {
     }
 }
 
-export { save, getSaved, getSavedMixes, getSavedPlaylists };
+export { save, saveMix, savePlaylist, getSaved, getSavedMixes, getSavedPlaylists };
 export type { SavedPlaylistInfo, SavedMixInfo, Library };

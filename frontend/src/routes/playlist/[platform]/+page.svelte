@@ -10,11 +10,11 @@
     import { getPlaylist } from '../../../requests';
     import { TrackQueue } from '../../../stores';
     import TrackList from '../../../components/TrackList.svelte';
+    import { savePlaylist } from '../../../library';
 
     export let data: PageData;
     let id: string;
     let err: string | undefined;
-    // let playlistInfo: PlaylistInfoResponse | undefined;
     let playlist: PlaylistResponse | undefined;
 
     function isNotAlreadyInQueue(): boolean {
@@ -33,12 +33,10 @@
         id = $page.url.searchParams.get('id') || '';
 
         // request data from API endpoint for specified platform
-        // let res = await getPlaylistInfo(data.platform, id);
         let res = await getPlaylist(data.platform, id);
         if (isErrorResponse(res)) {
             err = res.error;
         } else {
-            // playlistInfo = res;
             playlist = res
         }
     });
@@ -73,36 +71,7 @@
                 return;
             }
 
-            // save playlist to localStorage
-            let savedRaw = localStorage.getItem('savedPlaylists');
-            if (!savedRaw) {
-                localStorage.setItem('savedPlaylists', `[${playlist.playlist_id}]`);
-                return;
-            }
-
-            // check if this playlist alr saved
-            let saved;
-            try {
-                saved = JSON.parse(savedRaw);
-            } catch (err) {
-                // json decode error => overwrite savedPlaylists
-                localStorage.setItem('savedPlaylists', `[${playlist.playlist_id}]`);
-                return;
-            }
-
-            if (!(Array.isArray(saved))) {
-                localStorage.setItem('savedPlaylists', `[${playlist.playlist_id}]`);
-                return;
-            }
-
-            let item = `${data.platform}:${playlist.playlist_id}`;
-            if (saved.includes(item)) {
-                console.log('Playlist already saved to library');
-                return;
-            };
-
-            saved.push(item);
-            localStorage.setItem('savedPlaylists', JSON.stringify(saved));
+            savePlaylist({ id: playlist.playlist_id, platform: data.platform });
         }}>Save playlist</button>
 
         <a href="/queue" on:click={() => {
