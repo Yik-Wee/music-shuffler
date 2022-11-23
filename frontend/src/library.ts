@@ -15,7 +15,8 @@ type SavedPlaylistInfo = {
 };
 
 type SavedMixInfo = {
-    id: string;
+    // id: string;
+    /** Title of the mix. Must be unique. */
     title: string;
     playlists: SavedPlaylistInfo[];
 };
@@ -30,8 +31,8 @@ function isSavedMix(value: any): value is SavedMixInfo {
     return (
         info !== undefined &&
         info.playlists !== undefined &&
-        info.title !== undefined &&
-        info.id !== undefined
+        info.title !== undefined
+        // info.id !== undefined
     );
 }
 
@@ -47,7 +48,8 @@ function saveMix(mix: SavedMixInfo) {
     }
 
     // check if this mix is alr saved
-    if (saved.some((obj) => obj.id === mix.id)) {
+    // if (saved.some((obj) => obj.id === mix.id)) {
+    if (saved.some((obj) => obj.title === mix.title)) {
         return;
     }
 

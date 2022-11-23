@@ -10,21 +10,17 @@
 
 <div class="test-playlistcard">
     <div class="test">
-        <PlaylistCard {...info} />
         <PlaylistCard --width="120px" --height="240px" --lines=4 {...info} />
         <PlaylistCard --width="240px" --height="240px" --lines=5 {...info} />
         <PlaylistCard --width="75%" --height="240px" --thumbnail-height="{0.6*240}px" {...info} />
         <PlaylistCard --width="40%" --height="100%" {...info} />
-        <!-- <PlaylistCard {...info} /> -->
-        <!-- <PlaylistCard {...info} />
         <PlaylistCard {...info} />
         <PlaylistCard {...info} />
         <PlaylistCard {...info} />
         <PlaylistCard {...info} />
         <PlaylistCard {...info} />
         <PlaylistCard {...info} />
-        <PlaylistCard {...info} />
-        <PlaylistCard {...info} /> -->
+        <PlaylistCard title="Add Playlist" owner="" thumbnail="/assets/plus.svg" />
     </div>
 </div>
 

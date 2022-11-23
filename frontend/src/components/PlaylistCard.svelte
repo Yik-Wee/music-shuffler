@@ -8,6 +8,7 @@
 * `title`: title of the playlist
 * `owner`: the owner of the playlist
 * `thumbnail`: the playlist's thumbnail. Set to empty string `''` by default if no thumbnail
+* `editable`: whether the playlist card title should be able to be edited
 
 # Events
 * `on:click`: called when the card is clicked
@@ -16,17 +17,23 @@
     export let title: string;
     export let owner: string;
     export let thumbnail: string = '';
+    export let editable = false;
+    export let classlist = '';
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<div class="playlist-card" on:click>
+<div class="playlist-card {classlist}" on:click>
     <div class="playlist-card-thumbnail">
         {#if thumbnail}
             <img src={thumbnail} alt="{title} by {owner}" />
         {/if}
     </div>
     <div class="playlist-card-text-big">
-        <span>{title}</span>
+        {#if editable}
+            <slot />
+        {:else}
+            <span>{title}</span>
+        {/if}
     </div>
     <div class="playlist-card-text-small">
         <span>{owner}</span>
@@ -40,6 +47,8 @@
         --lines: 3;
         --thumbnail-width: auto;
         --thumbnail-height: calc(0.4 * var(--height));
+        --bg-colour: whitesmoke;
+        --bg-colour-hover: salmon;
     }
 
     .playlist-card {
@@ -47,7 +56,7 @@
         border-radius: 4px;
         width: var(--width);
         height: var(--height);
-        background: whitesmoke;
+        background: var(--bg-colour);
         overflow: hidden;
         cursor: pointer;
         grid-template-rows: [thumbnail] var(--thumbnail-height) [title] 2fr [owner] 1fr;
@@ -55,7 +64,7 @@
     }
 
     .playlist-card:hover {
-        background: salmon;
+        background: var(--bg-colour-hover);
     }
 
     .playlist-card > .playlist-card-text-big,

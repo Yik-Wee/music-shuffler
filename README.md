@@ -1,8 +1,12 @@
 # TODO
-- [ ] Deal with unavailable youtube videos e.g. countdown, skip in 5s or something
+## Backend
 - [ ] Finish `SpotifyApi` and test it
 - [ ] Finish `SoundCloudApi` and test it
-- [ ] Add `/library` route: caching **playlist IDs** and mixes (`playlistID[]`) in `localStorage` -> `fetch` title, owner & length from API endpoint
+- [ ] Deal with deleted videos server side
+
+## Frontend
+- [ ] Deal with unavailable youtube videos e.g. countdown, skip in 5s or something
+- [ ] `/library`: Ability to remove saved playlists.
 - [ ] Add playlist mixes to frontend (shuffle tracks from multiple playlists)
 - [ ] Add specific tracks from different playlists to queue
 - [ ] Add `NavBar`
@@ -13,12 +17,15 @@
 - [ ] Add styling to frontend
 - [ ] Add settings
 - [ ] Decide whether to render thumbnails client side & store thumbnails server side. If so, change.
-- [ ] Deal with deleted videos server side
-- [ ] **(1?)** Use 206 partial response with flask API routes, using `yield` and `generator(), ...`
+
+# TODO Maybe
+- [ ] Use 206 partial response with flask API routes, using `yield` and `generator(), ...`
   - Reference: https://flask.palletsprojects.com/en/2.2.x/patterns/streaming/
-- [ ] **(2?)** API cache so when user reloads page, `api_endpoint()` will wait for the previous API call to complete and use that result instead of making another API call
-- [ ] **(3?)** If playlist/mix `length > 5000`, make a request to `/api/random_track?platform=...&id=...` instead of storing the entire playlist which would take up too much memory
-- [ ] **(4?)** If playlist/mix `length > 5000`, randomise the `position` pointer to get the next random track instead of shuffling then rerendering the queue
+- [ ] API cache so when user reloads page, `api_endpoint()` will wait for the previous API call to complete and use that result instead of making another API call
+- [ ] If playlist/mix `length > 5000`, make a request to `/api/random_track?platform=...&id=...` instead of storing the entire playlist which would take up too much memory
+- [ ] If playlist/mix `length > 5000`, randomise the `position` pointer to get the next random track instead of shuffling then rerendering the queue
+- [ ] `youtube.py`: `YouTubeApi` use If-None-Match header
+  - https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag
 
 # Navigation redo
 - `/mix?id=...`
