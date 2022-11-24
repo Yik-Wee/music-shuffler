@@ -1,14 +1,28 @@
 # TODO
 ## Backend
+- [ ] `YouTubeApi`: use `item['contentDetails']['itemCount']` to get `Length` field.
+  - Afterwards, the `length == -1` check can be removed
+  - https://developers.google.com/youtube/v3/docs/playlists#contentDetails.itemCount
 - [ ] Finish `SpotifyApi` and test it
+  - https://developer.spotify.com/documentation/web-api/reference/#/operations/get-playlist
 - [ ] Finish `SoundCloudApi` and test it
+  - SoundCloud API no longer supports registering an app (since like 2019 or something -_-)
+  - Request regular frontend routes and parse the response for playlist data
+  - ID stored must be the request path `url` / `permalink_url` ~~OR the id e.g. 118270473 and request sent to the widget endpoint.~~
+  - use `last_modified` as the etag
+  - https://github.com/skdhg/soundcloud-scraper
+  - [ ] Custom hash function for hashing soundcloud playlists into etag?
 - [ ] Deal with deleted videos server side
 
 ## Frontend
 - [ ] Deal with unavailable youtube videos e.g. countdown, skip in 5s or something
 - [ ] `/library`: Ability to remove saved playlists.
 - [ ] Add playlist mixes to frontend (shuffle tracks from multiple playlists)
-- [ ] Add specific tracks from different playlists to queue
+- [ ] `SearchBar.svelte` changes
+  - Only have 1 input - the playlist URL
+  - Regex the URL to validate get the `platform` and `id`
+  - `encodeURIComponent(id)` because soundcloud playlists will have slashes
+  - Still routes to `/playlist/[platform]?id=[id]`
 - [ ] Add `NavBar`
 - [ ] Search function to find a track in the playlist/queue
 - [ ] Ability to empty the queue
