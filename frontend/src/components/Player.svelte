@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { containerId } from "../../stores";
+    import { containerId } from "../stores";
     import { createEventDispatcher } from "svelte";
-    import SoundCloudPlayer from "./SoundCloudPlayer.svelte";
-    import SpotifyPlayer from "./SpotifyPlayer.svelte";
-    import YouTubePlayer from "./YouTubePlayer.svelte";
+    import SoundCloudPlayer from "./Player/SoundCloudPlayer.svelte";
+    import SpotifyPlayer from "./Player/SpotifyPlayer.svelte";
+    import YouTubePlayer from "./Player/YouTubePlayer.svelte";
 
     let dispatch = createEventDispatcher();
 
