@@ -1,30 +1,37 @@
 <script lang="ts">
-    let platform: string = 'youtube';
-    let id: string = '';
-    let search: HTMLAnchorElement;
-    let isValid = false;
+    import { parse, type ParsedUrl } from "./SearchBar/url";
 
-    function validate(id: string): boolean {
-        // ...
-        return id !== '' && !id.includes(' ');
+
+    // let platform: string = 'youtube';
+    // let id: string = '';
+    let search: HTMLAnchorElement;
+    // let isValid = false;
+
+    // function validate(id: string): boolean {
+    //     // ...
+    //     return id !== '' && !id.includes(' ');
+    // }
+
+    let url: string = '';
+    let parsedUrl: ParsedUrl | null = null;
+
+    function toHref(parsedUrl: ParsedUrl | null): string {
+        if (parsedUrl === null) {
+            return 'javascript:void(0)';
+        }
+        return `/search?platform=${parsedUrl.platform}&id=${encodeURIComponent(parsedUrl.id)}`
     }
 </script>
 
-<div id="search-bar" class:error={!isValid}>
-    <select name="platform" id="platform" bind:value={platform}>
-        <option value="youtube">YouTube</option>
-        <option value="spotify">Spotify</option>
-        <option value="soundcloud">SoundCloud</option>
-    </select>
+<div class="search-bar" class:error={parsedUrl === null}>
     <input
         type="text"
         name="id"
-        bind:value={id}
+        bind:value={url}
         on:input={() => {
-            // validation here?
-            id = id.trim();
-            isValid = validate(id);
-            console.log(isValid);
+            url = url.trim();
+            parsedUrl = parse(url);
+            console.log(parsedUrl);
         }}
         on:keydown={({ key }) => {
             if (key === 'Enter') {
@@ -32,37 +39,20 @@
             }
         }}
     />
-    <div id="search-button-container">
-        <a
-            id="search-button"
-            href="/search?platform={platform}&id={encodeURIComponent(id)}"
-            bind:this={search}
-        >
-            👌
-        </a>
+
+    <div class="search-button-container">
+        <a class="search-button" href="{toHref(parsedUrl)}" bind:this={search}>👌</a>
     </div>
 </div>
 
 <style>
-    #platform {
-        border: 0;
-        outline: 0;
-        border-bottom: 2px solid lightskyblue;
-        transition: all 100ms ease-in-out;
-    }
-
-    #platform:hover,
-    #platform:focus {
-        border-bottom: 2px solid blue;
-    }
-
-    #search-bar {
+    .search-bar {
         display: flex;
         flex-direction: row;
         column-gap: 0.5rem;
     }
 
-    #search-bar > input {
+    .search-bar > input {
         width: 50%;
         outline: 0;
         border: 0;
@@ -70,22 +60,22 @@
         transition: all 200ms ease-in-out;
     }
 
-    #search-bar > input:focus,
-    #search-bar > input:hover {
+    .search-bar > input:focus,
+    .search-bar > input:hover {
         border-bottom: 2px solid blue;
     }
 
-    #search-bar.error > input:focus,
-    #search-bar.error > input:hover {
+    .search-bar.error > input:focus,
+    .search-bar.error > input:hover {
         border-bottom: 2px solid red;
     }
 
-    #search-bar.error > #search-button-container > #search-button {
+    .search-bar.error > .search-button-container > .search-button {
         opacity: 50%;
         pointer-events: none;
     }
 
-    #search-bar.error > #search-button-container {
+    .search-bar.error > .search-button-container {
         cursor: not-allowed;
     }
 </style>
