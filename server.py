@@ -75,7 +75,7 @@ def api_playlist_info(platform: str):
     })
 
     colls['Playlist'].insert({
-        'PlaylistID': playlist_id,
+        'PlaylistID': playlist_info['playlist_id'],
         'Title': playlist_info['title'],
         'Owner': playlist_info['owner'],
         'Description': playlist_info['description'],
@@ -183,7 +183,7 @@ def api_full_playlist(platform: str):
             records = result.value
             playlist: Playlist = {
                 'platform': platform,
-                'playlist_id': playlist_id,
+                'playlist_id': cached_record['PlaylistID'],
                 'title': cached_record['Title'],
                 'owner': cached_record['Owner'],
                 'description': cached_record['Description'],
@@ -220,7 +220,7 @@ def api_full_playlist(platform: str):
 
     # delete the old cache
     res = playlist_tracks_coll.delete({
-        'PlaylistID': playlist_id,
+        'PlaylistID': playlist['playlist_id'],
         'Platform': platform,
     })
     if not res.ok:
@@ -233,7 +233,7 @@ def api_full_playlist(platform: str):
             f'(PlaylistID = {playlist_id}, Platform = {platform})')
 
     res = playlist_coll.delete({
-        'PlaylistID': playlist_id,
+        'PlaylistID': playlist['playlist_id'],
         'Platform': platform,
     })
     if not res.ok:
@@ -247,7 +247,7 @@ def api_full_playlist(platform: str):
 
     # insert the new cache
     res = playlist_coll.insert({
-        'PlaylistID': playlist_id,
+        'PlaylistID': playlist['playlist_id'],
         'Title': playlist['title'],
         'Owner': playlist['owner'],
         'Description': playlist['description'],
@@ -279,7 +279,7 @@ def api_full_playlist(platform: str):
         tracks_to_insert.append(track_record)
 
         playlist_track_record = {
-            'PlaylistID': playlist_id,
+            'PlaylistID': playlist['playlist_id'],
             'TrackID': track['track_id'],
             'Platform': track['platform'],
             'Position': i,
