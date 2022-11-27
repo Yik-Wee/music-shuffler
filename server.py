@@ -8,7 +8,7 @@ from backend import (
     colls
 )
 from backend.api import Playlist, Track
-from platforms import platform_apis, ALL_PLATFORMS
+from apis import platform_apis, ALL_PLATFORMS
 from debug_utils import print_blue, print_green, print_red
 
 BUILD_DIR = './frontend/build'
@@ -80,7 +80,7 @@ def api_playlist_info(platform: str):
         'Owner': playlist_info['owner'],
         'Description': playlist_info['description'],
         'Thumbnail': playlist_info['thumbnail'],
-        # 'Length': playlist_info['length'],
+        'Length': playlist_info['length'],
         'Etag': playlist_info['etag'],
         'Platform': platform,
     })

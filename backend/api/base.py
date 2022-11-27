@@ -33,6 +33,7 @@ class PlaylistInfo(TypedDict):
         'description': str,
         'thumbnail': str,
         'etag': str,
+        'length': int,
     }
     ```
     '''
@@ -43,6 +44,7 @@ class PlaylistInfo(TypedDict):
     description: str
     thumbnail: str
     etag: str
+    length: int
 
 
 class Playlist(PlaylistInfo):
@@ -61,7 +63,7 @@ class Playlist(PlaylistInfo):
     }
     ```
     '''
-    length: int
+    # length: int
     tracks: List[Track]
 
 
