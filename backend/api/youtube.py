@@ -144,7 +144,7 @@ class YouTubeApi(PlatformApi):
         '''
         playlist_id = playlist_id.strip()
         url = 'https://www.googleapis.com/youtube/v3/playlists'\
-            f'?part=snippet&id={playlist_id}&key={self.api_key}'
+            f'?part=snippet,contentDetails&id={playlist_id}&key={self.api_key}'
         response = requests.get(url, timeout=30)  # timeout 30 seconds
         if not response.ok:
             print(f'Error fetching etag for playlist {playlist_id}: {response.reason}')
@@ -175,6 +175,8 @@ class YouTubeApi(PlatformApi):
         all_thumbnails = snippet['thumbnails']
         thumbnail = choose_thumbnail(all_thumbnails)
 
+        length = playlist_resource['contentDetails']['itemCount']
+
         info = {
             'platform': self.platform,
             'playlist_id': playlist_id,
@@ -183,5 +185,6 @@ class YouTubeApi(PlatformApi):
             'description': description,
             'thumbnail': thumbnail,
             'etag': etag,
+            'length': length,
         }
         return info
