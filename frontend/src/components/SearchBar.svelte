@@ -1,25 +1,19 @@
 <script lang="ts">
-    import { parse, type ParsedUrl } from "./SearchBar/url";
+    import { parse, type ParsedUrl } from "../url";
 
-
-    // let platform: string = 'youtube';
-    // let id: string = '';
     let search: HTMLAnchorElement;
-    // let isValid = false;
-
-    // function validate(id: string): boolean {
-    //     // ...
-    //     return id !== '' && !id.includes(' ');
-    // }
-
     let url: string = '';
     let parsedUrl: ParsedUrl | null = null;
 
-    function toHref(parsedUrl: ParsedUrl | null): string {
+    function getHref(): string {
         if (parsedUrl === null) {
             return 'javascript:void(0)';
         }
-        return `/search?platform=${parsedUrl.platform}&id=${encodeURIComponent(parsedUrl.id)}`
+
+        let platform = parsedUrl.platform;
+        let encodedId = encodeURIComponent(parsedUrl.id);
+        let encodedDomain = encodeURIComponent(parsedUrl.domain);
+        return `/search?platform=${platform}&id=${encodedId}&domain=${encodedDomain}`;
     }
 </script>
 
@@ -27,6 +21,7 @@
     <input
         type="text"
         name="id"
+        placeholder="Playlist URL"
         bind:value={url}
         on:input={() => {
             url = url.trim();
@@ -41,7 +36,7 @@
     />
 
     <div class="search-button-container">
-        <a class="search-button" href="{toHref(parsedUrl)}" bind:this={search}>👌</a>
+        <a class="search-button" href="{getHref()}" bind:this={search}>👌</a>
     </div>
 </div>
 

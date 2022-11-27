@@ -5,16 +5,19 @@
     import { getPlaylistInfo } from '../../requests';
     import PlaylistCard from '../../components/PlaylistCard.svelte';
     import { afterNavigate, goto } from '$app/navigation';
+    import { SoundCloud } from '../../url';
 
     let id: string;
     let platform: string;
+    let domain: string;
     let err: string | undefined;
     let playlistInfo: PlaylistInfoResponse | undefined;
-    let link: HTMLAnchorElement;
+    // let link: HTMLAnchorElement;
 
     async function update() {
         id = $page.url.searchParams.get('id')?.trim() || '';
         platform = $page.url.searchParams.get('platform')?.trim() || '';
+        domain = $page.url.searchParams.get('domain')?.trim() || '';
 
         if (!id) {
             err = 'No id specified';
@@ -24,6 +27,33 @@
         if (!platform) {
             err = 'No platform specified';
             return;
+        }
+
+        if (domain === 'on.soundcloud.com') {
+            // check if domain is on.soundcloud.com (shortened link)
+            // convert the path to the canonical permalink_url used as the id
+            let reCanonicalUrl = /<link rel="canonical" href="(https:\/\/soundcloud\.com\/[^"]*)">/gmi;
+            let res = await fetch(`https://on.soundcloud.com/${id}`);
+            let text = await res.text();
+            if (!res.ok) {
+                err = text;
+                return;
+            }
+
+            let matches = reCanonicalUrl.exec(text);
+            if (matches?.length !== 2) {
+                err = 'Playlist not found';
+                return;
+            }
+
+            let canonicalUrl = matches[1];
+            let canonicalPath = SoundCloud.parsePath(canonicalUrl);
+            if (!canonicalPath) {
+                err = 'Playlist not found';
+                return;
+            }
+
+            id = canonicalPath;
         }
 
         // request data from API endpoint for specified platform

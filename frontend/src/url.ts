@@ -5,6 +5,7 @@
 type ParsedUrl = {
     platform: string;
     id: string;
+    domain: string;
 };
 
 const RE_URL = /^(?:https?:\/\/)?(\w+(?:\.\w+)+)\/(.+)$/i;
@@ -40,7 +41,8 @@ function parse(url: string): ParsedUrl | null {
 
         return {
             platform: 'youtube',
-            id
+            id,
+            domain,
         };
     }
 
@@ -54,7 +56,8 @@ function parse(url: string): ParsedUrl | null {
 
         return {
             platform: 'soundcloud',
-            id: scPath
+            id: scPath,
+            domain,
         };
     }
 
@@ -68,7 +71,8 @@ function parse(url: string): ParsedUrl | null {
 
         return {
             platform: 'spotify',
-            id
+            id,
+            domain,
         };
     }
 
@@ -145,4 +149,4 @@ namespace Spotify {
     }
 }
 
-export { parse, type ParsedUrl };
+export { parse, type ParsedUrl, YouTube, SoundCloud, Spotify };

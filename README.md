@@ -15,9 +15,9 @@
 - [ ] Deal with deleted videos server side
 
 ## Frontend
+- [ ] Add playlist mixes to frontend (shuffle tracks from multiple playlists)
 - [ ] Deal with unavailable youtube videos e.g. countdown, skip in 5s or something
 - [ ] `/library`: Ability to remove saved playlists.
-- [ ] Add playlist mixes to frontend (shuffle tracks from multiple playlists)
 - [ ] `SearchBar.svelte` changes
   - Only have 1 input - the playlist URL
   - Regex the URL to validate get the `platform` and `id`
