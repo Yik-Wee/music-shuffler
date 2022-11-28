@@ -4,7 +4,6 @@
     import { onMount } from 'svelte';
     import {
         isErrorResponse,
-        toPlaylistInfo,
         type PlaylistResponse,
     } from '../../../types/PlaylistTracks';
     import { getPlaylist } from '../../../requests';
@@ -19,22 +18,16 @@
 
     function isNotAlreadyInQueue(): boolean {
         return TrackQueue.id() !== playlist?.playlist_id;
-        // if (TrackQueue.playlists().length !== 1) {
-        //     return true;
-        // }
-
-        // let { platform, playlist_id } = TrackQueue.playlists()[0];
-        // return platform === data.platform && playlist_id === playlist?.playlist_id;
-
-        // let queueIds = TrackQueue.playlists().map(p => p.playlist_id);
-        // return queueIds.length !== 1 || queueIds[0] !== id;
     }
 
     function setQueueIfQueueDiff() {
-        if (isNotAlreadyInQueue() && playlist) {
+        if (playlist && (
+                TrackQueue.id() !== playlist.playlist_id ||
+                TrackQueue.platform() !== playlist.platform
+            )
+        ) {
             // set current playlist to play in queue
-            // TrackQueue.setQueue(playlist.tracks, [toPlaylistInfo(playlist)]);
-            TrackQueue.setQueue(playlist.tracks, playlist.playlist_id);
+            TrackQueue.setQueue(playlist.tracks, playlist.playlist_id, playlist.platform.toLowerCase());
         }
     }
 

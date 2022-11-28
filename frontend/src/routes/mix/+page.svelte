@@ -17,8 +17,12 @@
     let mix: SavedMix | undefined;
 
     function setQueueIfQueueDiff() {
-        if (mix && TrackQueue.id() !== mix.title) {
-            TrackQueue.setQueue(mix.tracks, mix.title);
+        if (mix && (
+                TrackQueue.platform() !== 'mix' ||
+                TrackQueue.id() !== mix.title
+            )
+        ) {
+            TrackQueue.setQueue(mix.tracks, mix.title, 'mix');
         }
     }
 

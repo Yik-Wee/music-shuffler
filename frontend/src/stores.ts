@@ -41,6 +41,7 @@ namespace TrackQueue {
         tracklist: Track[];
         // playlists: PlaylistInfoResponse[];
         id: string,
+        platform: string,
     };
 
     let queue: Queue = {
@@ -48,36 +49,35 @@ namespace TrackQueue {
         tracklist: [],
         // playlists: []
         id: '',
+        platform: '',
     };
 
-    // /**
-    //  * Set/reset the queue to store the `tracklist` and `playlists` the tracks are from.
-    //  * @param tracklist The list of tracks stored in the queue
-    //  * @param playlists The playlists (and their respective PlaylistInfo) the tracks are from
-    //  */
-    // export function setQueue(tracklist: Track[], playlists: PlaylistInfoResponse[]) {
-    //     queue.tracklist = tracklist;
-    //     queue.position = 0;
-    //     queue.playlists = playlists;
-    // }
-    export function setQueue(tracklist: Track[], id: string) {
+    /**
+     * Set/reset the queue to store the `tracklist` and `playlists` the tracks are from.
+     * @param tracklist The list of tracks stored in the queue
+     * @param id The id of the playlist, or unique title of the mix.
+     * @param platform the platform of the playlist, or 'mix' if it is a mix
+     */
+    export function setQueue(tracklist: Track[], id: string, platform: string) {
         queue.tracklist = tracklist;
         queue.position = 0;
         queue.id = id;
+        queue.platform = platform;
     }
-
-    // /**
-    //  * @returns {PlaylistInfoResponse[]} the `playlists` the tracks stored in the queue belong to
-    //  */
-    // export function playlists(): PlaylistInfoResponse[] {
-    //     return queue.playlists;
-    // }
         
     /**
-     * @returns {string} the id of the playlist or mix in the queue
+     * @returns {string} the id of the playlist or unique title of the mix in the queue
      */
     export function id(): string {
         return queue.id;
+    }
+
+    /**
+     * 
+     * @returns {string} the platform of the playlist, or 'mix' if a mix is in the queue
+     */
+    export function platform(): string {
+        return queue.platform;
     }
 
     /**
