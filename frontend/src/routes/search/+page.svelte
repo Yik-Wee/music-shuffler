@@ -12,7 +12,6 @@
     let domain: string;
     let err: string | undefined;
     let playlistInfo: PlaylistInfoResponse | undefined;
-    // let link: HTMLAnchorElement;
 
     async function update() {
         id = $page.url.searchParams.get('id')?.trim() || '';
@@ -32,7 +31,8 @@
         if (domain === 'on.soundcloud.com') {
             // check if domain is on.soundcloud.com (shortened link)
             // convert the path to the canonical permalink_url used as the id
-            let reCanonicalUrl = /<link rel="canonical" href="(https:\/\/soundcloud\.com\/[^"]*)">/gmi;
+            let reCanonicalUrl =
+                /<link rel="canonical" href="(https:\/\/soundcloud\.com\/[^"]*)">/gim;
             let res = await fetch(`https://on.soundcloud.com/${id}`);
             let text = await res.text();
             if (!res.ok) {
@@ -95,6 +95,5 @@
             --thumbnail-height="{0.6 * height}px"
             on:click={() => goto(`/playlist/${platform}?id=${id}`)}
         />
-        <!-- <a href="/playlist/{platform}?id={id}" bind:this={link}>Play</a> -->
     {/if}
 </div>

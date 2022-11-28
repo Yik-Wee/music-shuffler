@@ -2,10 +2,7 @@
     import type { PageData } from './$types';
     import { page } from '$app/stores';
     import { onMount } from 'svelte';
-    import {
-        isErrorResponse,
-        type PlaylistResponse,
-    } from '../../../types/PlaylistTracks';
+    import { isErrorResponse, type PlaylistResponse } from '../../../types/PlaylistTracks';
     import { getPlaylist } from '../../../requests';
     import { TrackQueue } from '../../../stores';
     import TrackList from '../../../components/TrackList.svelte';
@@ -16,18 +13,18 @@
     let err: string | undefined;
     let playlist: PlaylistResponse | undefined;
 
-    function isNotAlreadyInQueue(): boolean {
-        return TrackQueue.id() !== playlist?.playlist_id;
-    }
-
     function setQueueIfQueueDiff() {
-        if (playlist && (
-                TrackQueue.id() !== playlist.playlist_id ||
-                TrackQueue.platform() !== playlist.platform
-            )
+        if (
+            playlist &&
+            (TrackQueue.id() !== playlist.playlist_id ||
+                TrackQueue.platform() !== playlist.platform)
         ) {
             // set current playlist to play in queue
-            TrackQueue.setQueue(playlist.tracks, playlist.playlist_id, playlist.platform.toLowerCase());
+            TrackQueue.setQueue(
+                playlist.tracks,
+                playlist.playlist_id,
+                playlist.platform.toLowerCase()
+            );
         }
     }
 
@@ -39,7 +36,7 @@
         if (isErrorResponse(res)) {
             err = res.error;
         } else {
-            playlist = res
+            playlist = res;
         }
     });
 </script>
@@ -68,18 +65,27 @@
             />
         </div>
 
-        <button on:click={() => {
-            if (!playlist) {
-                return;
-            }
+        <button
+            on:click={() => {
+                if (!playlist) {
+                    return;
+                }
 
-            savePlaylist({ id: playlist.playlist_id, platform: data.platform });
-        }}>Save playlist</button>
+                savePlaylist({ id: playlist.playlist_id, platform: data.platform });
+            }}>Save playlist</button
+        >
 
-        <a href="/queue" on:click={() => {
-            setQueueIfQueueDiff();
-        }}>Shuffle in queue</a>
+        <a
+            href="/queue"
+            on:click={() => {
+                setQueueIfQueueDiff();
+            }}>Shuffle in queue</a
+        >
 
-        <TrackList tracklist={playlist.tracks} ifempty="Playlist is empty" trackclick={setQueueIfQueueDiff} />
+        <TrackList
+            tracklist={playlist.tracks}
+            ifempty="Playlist is empty"
+            trackclick={setQueueIfQueueDiff}
+        />
     {/if}
 </div>

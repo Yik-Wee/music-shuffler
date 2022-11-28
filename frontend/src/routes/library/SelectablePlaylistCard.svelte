@@ -1,16 +1,10 @@
 <script lang="ts">
-    import type { PlaylistInfoResponse } from "../../types/PlaylistTracks";
-    import PlaylistCard from "../../components/PlaylistCard.svelte";
-    import type { SavedPlaylistInfo } from "../../library";
+    import type { PlaylistInfoResponse } from '../../types/PlaylistTracks';
+    import PlaylistCard from '../../components/PlaylistCard.svelte';
+    import type { SavedPlaylistInfo } from '../../library';
 
     export let playlistInfo: PlaylistInfoResponse;
-    let {
-        playlist_id,
-        platform,
-        title,
-        owner,
-        thumbnail,
-    } = playlistInfo;
+    let { playlist_id, platform, title, owner, thumbnail } = playlistInfo;
 
     export let selectedlist: SavedPlaylistInfo[];
 
@@ -21,17 +15,14 @@
 <div class:selected>
     <PlaylistCard
         --bg-colour-hover="var(--bg-colour)"
-        --bg-colour="{selected ? 'greenyellow' : 'whitesmoke'}"
+        --bg-colour={selected ? 'greenyellow' : 'whitesmoke'}
         {title}
         {owner}
         {thumbnail}
         on:click={() => {
             if (selected) {
-                let idx = selectedlist.findIndex(info => {
-                    return (
-                        info.id === playlist_id &&
-                        info.platform === platform
-                    )
+                let idx = selectedlist.findIndex((info) => {
+                    return info.id === playlist_id && info.platform === platform;
                 });
 
                 if (idx === -1) {
@@ -43,7 +34,7 @@
             } else {
                 selectedlist.push({
                     id: playlist_id,
-                    platform,
+                    platform
                 });
                 selected = true;
             }

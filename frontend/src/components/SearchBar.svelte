@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { parse, type ParsedUrl } from "../url";
+    import { parse, type ParsedUrl } from '../url';
 
     let search: HTMLAnchorElement;
     let url: string = '';
@@ -36,7 +36,7 @@
     />
 
     <div class="search-button-container">
-        <a class="search-button" href="{getHref()}" bind:this={search}>👌</a>
+        <a class="search-button" href={getHref()} bind:this={search}>👌</a>
     </div>
 </div>
 

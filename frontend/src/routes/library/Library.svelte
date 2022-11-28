@@ -1,10 +1,10 @@
 <script lang="ts">
-    import { getSaved, getSavedMixes, save, type Library, type SavedMixInfo } from "../../library";
-    import PlaylistCard from "../../components/PlaylistCard.svelte";
-    import SelectablePlaylistCard from "./SelectablePlaylistCard.svelte";
-    import { goto } from "$app/navigation";
-    import type { PlaylistInfoResponse } from "../../types/PlaylistTracks";
-    import { onMount } from "svelte";
+    import { getSaved, getSavedMixes, save, type Library, type SavedMixInfo } from '../../library';
+    import PlaylistCard from '../../components/PlaylistCard.svelte';
+    import SelectablePlaylistCard from './SelectablePlaylistCard.svelte';
+    import { goto } from '$app/navigation';
+    import type { PlaylistInfoResponse } from '../../types/PlaylistTracks';
+    import { onMount } from 'svelte';
 
     export let mixes: SavedMixInfo[];
     export let playlists: PlaylistInfoResponse[];
@@ -12,8 +12,8 @@
     let selecting: boolean = false;
 
     let newMix: SavedMixInfo = {
-        title: '',  // must be unique
-        playlists: [],
+        title: '', // must be unique
+        playlists: []
     };
 
     let savedMixes: SavedMixInfo[];
@@ -36,7 +36,7 @@
         }
 
         let trimmed = title.trim();
-        let idx = savedMixes.findIndex(m => m.title === trimmed);
+        let idx = savedMixes.findIndex((m) => m.title === trimmed);
         return idx === -1;
     }
 
@@ -53,11 +53,7 @@
     <h1>Saved Playlists</h1>
     <div class="library-area">
         {#each playlists as playlistInfo}
-            <!-- {selectedlist} -->
-            <SelectablePlaylistCard
-                selectedlist={newMix.playlists}
-                {playlistInfo}
-            />
+            <SelectablePlaylistCard selectedlist={newMix.playlists} {playlistInfo} />
         {/each}
         <button disabled>Edit</button>
     </div>
@@ -65,11 +61,7 @@
     <h1>Saved Mixes</h1>
     <div class="library-area disabled">
         {#each mixes as mixInfo}
-            <PlaylistCard
-                title={mixInfo.title}
-                owner="Me"
-                thumbnail="/assets/jammies.gif"
-            />
+            <PlaylistCard title={mixInfo.title} owner="Me" thumbnail="/assets/jammies.gif" />
         {/each}
 
         <PlaylistCard
@@ -88,54 +80,55 @@
                     isValidTitle = validateTitle(newMix.title);
                     console.log(isValidTitle);
                 }}
-            >
+            />
         </PlaylistCard>
 
-        <button on:click={() => {            
-            if (!isValidTitle) {
-                newMixError = 'Mix title must be unique';
-                return;
-            }
-            
-            if (!validateMixLength(newMix)) {
-                newMixError = 'Mix must include more than 1 playlist';
-                return;
-            }
-            
-            newMix.title = newMix.title.trim();
-            console.log(newMix);
+        <button
+            on:click={() => {
+                if (!isValidTitle) {
+                    newMixError = 'Mix title must be unique';
+                    return;
+                }
 
-            selecting = false;
-            mixes.push(newMix);
-            save(newMix);
+                if (!validateMixLength(newMix)) {
+                    newMixError = 'Mix must include more than 1 playlist';
+                    return;
+                }
 
-            newMix = {
-                title: '',
-                playlists: [],
-            };
-        }}>
+                newMix.title = newMix.title.trim();
+                console.log(newMix);
+
+                selecting = false;
+                mixes.push(newMix);
+                save(newMix);
+
+                newMix = {
+                    title: '',
+                    playlists: []
+                };
+            }}
+        >
             Done
             <div class="mix-error-message"><b>{newMixError}</b></div>
         </button>
-        <button on:click={() => {
-            // cancel and reset everything
-            selecting = false;
-            isValidTitle = false;
-            newMixError = '';
-            newMix = {
-                title: '',
-                playlists: [],
-            };
-        }}>Cancel</button>
+        <button
+            on:click={() => {
+                // cancel and reset everything
+                selecting = false;
+                isValidTitle = false;
+                newMixError = '';
+                newMix = {
+                    title: '',
+                    playlists: []
+                };
+            }}>Cancel</button
+        >
     </div>
 {:else}
     <h1>Saved Playlists</h1>
     <div class="library-area">
         {#each playlists as playlistInfo}
-            <PlaylistCard
-                {...playlistInfo}
-                on:click={() => gotoPlaylist(playlistInfo)}
-            />
+            <PlaylistCard {...playlistInfo} on:click={() => gotoPlaylist(playlistInfo)} />
         {/each}
         <button>Edit</button>
     </div>
@@ -155,7 +148,7 @@
             title="Add Mix"
             owner=""
             thumbnail="/assets/plus.svg"
-            on:click={() => selecting = true}
+            on:click={() => (selecting = true)}
         />
     </div>
 {/if}
