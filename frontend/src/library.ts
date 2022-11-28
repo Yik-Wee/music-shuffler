@@ -3,7 +3,7 @@
  */
 
 import { getPlaylistInfo } from "./requests";
-import { isErrorResponse, type PlaylistInfoResponse } from "./types/PlaylistTracks";
+import { isErrorResponse, type PlaylistInfoResponse, type PlaylistResponse, type Track } from "./types/PlaylistTracks";
 
 const MIXES_KEY = 'saved-mixes';
 const PLAYLISTS_KEY = 'saved-playlists';
@@ -15,11 +15,17 @@ type SavedPlaylistInfo = {
 };
 
 type SavedMixInfo = {
-    // id: string;
     /** Title of the mix. Must be unique. */
     title: string;
     playlists: SavedPlaylistInfo[];
 };
+
+type SavedMix = {
+    title: string;
+    /** playlist ids */
+    playlists: PlaylistInfoResponse[];
+    tracks: Track[];
+}
 
 function isSavedPlaylist(value: any): value is SavedPlaylistInfo {
     let info = value as SavedPlaylistInfo;
@@ -117,6 +123,20 @@ function getSavedMixes(): SavedMixInfo[] | null {
     return validSavedMixes;
 }
 
+function findSavedMix(title: string): SavedMixInfo | null {
+    let mixes = getSavedMixes();
+    if (!mixes) {
+        return null;
+    }
+
+    let found = mixes.find(mixInfo => mixInfo.title === title);
+    if (!found) {
+        return null;
+    }
+
+    return found;
+}
+
 function getSavedPlaylists(): SavedPlaylistInfo[] | null {
     let savedRaw = localStorage.getItem(PLAYLISTS_KEY);
     if (!savedRaw) {
@@ -174,5 +194,5 @@ async function getSaved(): Promise<Library> {
     }
 }
 
-export { save, saveMix, savePlaylist, getSaved, getSavedMixes, getSavedPlaylists };
-export type { SavedPlaylistInfo, SavedMixInfo, Library };
+export { save, saveMix, savePlaylist, getSaved, getSavedMixes, findSavedMix, getSavedPlaylists };
+export type { SavedPlaylistInfo, SavedMixInfo, SavedMix, Library };

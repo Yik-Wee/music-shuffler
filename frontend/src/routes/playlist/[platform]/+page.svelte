@@ -18,14 +18,23 @@
     let playlist: PlaylistResponse | undefined;
 
     function isNotAlreadyInQueue(): boolean {
-        let queueIds = TrackQueue.playlists().map(p => p.playlist_id);
-        return queueIds.length !== 1 || queueIds[0] !== id;
+        return TrackQueue.id() !== playlist?.playlist_id;
+        // if (TrackQueue.playlists().length !== 1) {
+        //     return true;
+        // }
+
+        // let { platform, playlist_id } = TrackQueue.playlists()[0];
+        // return platform === data.platform && playlist_id === playlist?.playlist_id;
+
+        // let queueIds = TrackQueue.playlists().map(p => p.playlist_id);
+        // return queueIds.length !== 1 || queueIds[0] !== id;
     }
 
     function setQueueIfQueueDiff() {
         if (isNotAlreadyInQueue() && playlist) {
             // set current playlist to play in queue
-            TrackQueue.setQueue(playlist.tracks, [toPlaylistInfo(playlist)]);
+            // TrackQueue.setQueue(playlist.tracks, [toPlaylistInfo(playlist)]);
+            TrackQueue.setQueue(playlist.tracks, playlist.playlist_id);
         }
     }
 

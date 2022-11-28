@@ -39,31 +39,45 @@ namespace TrackQueue {
     type Queue = {
         position: number;
         tracklist: Track[];
-        playlists: PlaylistInfoResponse[];
+        // playlists: PlaylistInfoResponse[];
+        id: string,
     };
 
     let queue: Queue = {
         position: 0,
         tracklist: [],
-        playlists: []
+        // playlists: []
+        id: '',
     };
 
-    /**
-     * Set/reset the queue to store the `tracklist` and `playlists` the tracks are from.
-     * @param tracklist The list of tracks stored in the queue
-     * @param playlists The playlists (and their respective PlaylistInfo) the tracks are from
-     */
-    export function setQueue(tracklist: Track[], playlists: PlaylistInfoResponse[]) {
+    // /**
+    //  * Set/reset the queue to store the `tracklist` and `playlists` the tracks are from.
+    //  * @param tracklist The list of tracks stored in the queue
+    //  * @param playlists The playlists (and their respective PlaylistInfo) the tracks are from
+    //  */
+    // export function setQueue(tracklist: Track[], playlists: PlaylistInfoResponse[]) {
+    //     queue.tracklist = tracklist;
+    //     queue.position = 0;
+    //     queue.playlists = playlists;
+    // }
+    export function setQueue(tracklist: Track[], id: string) {
         queue.tracklist = tracklist;
         queue.position = 0;
-        queue.playlists = playlists;
+        queue.id = id;
     }
 
+    // /**
+    //  * @returns {PlaylistInfoResponse[]} the `playlists` the tracks stored in the queue belong to
+    //  */
+    // export function playlists(): PlaylistInfoResponse[] {
+    //     return queue.playlists;
+    // }
+        
     /**
-     * @returns {PlaylistInfoResponse[]} the `playlists` the tracks stored in the queue belong to
+     * @returns {string} the id of the playlist or mix in the queue
      */
-    export function playlists(): PlaylistInfoResponse[] {
-        return queue.playlists;
+    export function id(): string {
+        return queue.id;
     }
 
     /**

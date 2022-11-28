@@ -7,7 +7,7 @@
 </script>
 
 <div>
-    <div id="queue-playlist-info">
+    <!-- <div id="queue-playlist-info">
         {#each TrackQueue.playlists() as { playlist_id, title, owner, thumbnail }}
             <div class="playlist-info-shortened">
                 {#if thumbnail}
@@ -18,7 +18,7 @@
                 <p>{owner}</p>
             </div>
         {/each}
-    </div>
+    </div> -->
 
     <button on:click={() => {
         console.log('clicked');

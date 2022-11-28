@@ -22,7 +22,11 @@
     });
 
     function gotoPlaylist(playlistInfo: PlaylistInfoResponse) {
-        goto(`/playlist/${playlistInfo.platform}?id=${playlistInfo.playlist_id}`);
+        goto(`/playlist/${playlistInfo.platform.toLowerCase()}?id=${playlistInfo.playlist_id}`);
+    }
+
+    function gotoMix(mixInfo: SavedMixInfo) {
+        goto(`/mix?title=${encodeURIComponent(mixInfo.title)}`);
     }
 
     function validateTitle(title: string): boolean {
@@ -143,6 +147,7 @@
                 title={mixInfo.title}
                 owner="Me"
                 thumbnail="/assets/jammies.gif"
+                on:click={() => gotoMix(mixInfo)}
             />
         {/each}
 

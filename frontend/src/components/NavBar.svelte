@@ -2,4 +2,5 @@
 
 <div id="navbar">
     <a href="/queue">Queue</a>
+    <a href="/library">Library</a>
 </div>

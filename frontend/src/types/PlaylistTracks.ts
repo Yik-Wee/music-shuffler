@@ -18,7 +18,7 @@ export type PlaylistResponse = PlaylistInfoResponse & {
     // description: string;
     // thumbnail: string;
     // etag: string;
-    length: number;
+    // length: number;
     tracks: Track[];
 };
 
@@ -30,6 +30,7 @@ export type PlaylistInfoResponse = {
     description: string;
     thumbnail: string;
     etag: string;
+    length: number;
 }
 
 export type ErrorResponse = {
@@ -40,6 +41,6 @@ export function isErrorResponse(obj: PlaylistResponse | PlaylistInfoResponse | E
     return (obj as ErrorResponse).error !== undefined;
 }
 
-export function toPlaylistInfo({ length, tracks, ...info }: PlaylistResponse): PlaylistInfoResponse {
+export function toPlaylistInfo({ tracks, ...info }: PlaylistResponse): PlaylistInfoResponse {
     return info;
 }
