@@ -23,14 +23,12 @@
   - Regex the URL to validate get the `platform` and `id`
   - `encodeURIComponent(id)` because soundcloud playlists will have slashes
   - Still routes to `/playlist/[platform]?id=[id]`
-- [ ] Add `NavBar`
 - [ ] Search function to find a track in the playlist/queue
 - [ ] Ability to empty the queue
 - [ ] Add lazy loading to track-renderer containers to speed up re-rendering of shuffled queue
   - https://css-tricks.com/lazy-loading-images-in-svelte/
 - [ ] Add styling to frontend
 - [ ] Add settings
-- [ ] Decide whether to render thumbnails client side & store thumbnails server side. If so, change.
 
 # TODO Maybe
 - [ ] Use 206 partial response with flask API routes, using `yield` and `generator(), ...`

@@ -1,6 +1,12 @@
 <script lang="ts"></script>
 
-<div id="navbar">
+<div class="navbar">
     <a href="/queue">Queue</a>
     <a href="/library">Library</a>
 </div>
+
+<style>
+    .navbar {
+        
+    }
+</style>
