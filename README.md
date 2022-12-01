@@ -15,18 +15,11 @@
 - [ ] Deal with deleted videos server side
 
 ## Frontend
-- [ ] Add playlist mixes to frontend (shuffle tracks from multiple playlists)
-- [ ] Deal with unavailable youtube videos e.g. countdown, skip in 5s or something
 - [ ] `/library`: Ability to remove saved playlists.
-- [ ] `SearchBar.svelte` changes
-  - Only have 1 input - the playlist URL
-  - Regex the URL to validate get the `platform` and `id`
-  - `encodeURIComponent(id)` because soundcloud playlists will have slashes
-  - Still routes to `/playlist/[platform]?id=[id]`
-- [ ] Search function to find a track in the playlist/queue
-- [ ] Ability to empty the queue
 - [ ] Add lazy loading to track-renderer containers to speed up re-rendering of shuffled queue
   - https://css-tricks.com/lazy-loading-images-in-svelte/
+- [ ] Search function to find a track in the playlist/queue
+- [ ] Deal with unavailable youtube videos e.g. countdown, skip in 5s or something
 - [ ] Add styling to frontend
 - [ ] Add settings
 
