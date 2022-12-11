@@ -2,8 +2,13 @@
  * Functions to manage saved playlists and mixes in the library
  */
 
-import { getPlaylistInfo } from "./requests";
-import { isErrorResponse, type PlaylistInfoResponse, type PlaylistResponse, type Track } from "./types/PlaylistTracks";
+import { getPlaylistInfo } from './requests';
+import {
+    isErrorResponse,
+    type PlaylistInfoResponse,
+    type PlaylistResponse,
+    type Track
+} from './types/PlaylistTracks';
 
 const MIXES_KEY = 'saved-mixes';
 const PLAYLISTS_KEY = 'saved-playlists';
@@ -25,7 +30,7 @@ type SavedMix = {
     /** playlist ids */
     playlists: PlaylistInfoResponse[];
     tracks: Track[];
-}
+};
 
 function isSavedPlaylist(value: any): value is SavedPlaylistInfo {
     let info = value as SavedPlaylistInfo;
@@ -35,9 +40,7 @@ function isSavedPlaylist(value: any): value is SavedPlaylistInfo {
 function isSavedMix(value: any): value is SavedMixInfo {
     let info = value as SavedMixInfo;
     return (
-        info !== undefined &&
-        info.playlists !== undefined &&
-        info.title !== undefined
+        info !== undefined && info.playlists !== undefined && info.title !== undefined
         // info.id !== undefined
     );
 }
@@ -129,7 +132,7 @@ function findSavedMix(title: string): SavedMixInfo | null {
         return null;
     }
 
-    let found = mixes.find(mixInfo => mixInfo.title === title);
+    let found = mixes.find((mixInfo) => mixInfo.title === title);
     if (!found) {
         return null;
     }
@@ -190,9 +193,27 @@ async function getSaved(): Promise<Library> {
     console.log(responses);
     return {
         mixes: saved.mixes,
-        playlists: responses.filter((res): res is PlaylistInfoResponse => !isErrorResponse(res)),
-    }
+        playlists: responses.filter((res): res is PlaylistInfoResponse => !isErrorResponse(res))
+    };
 }
 
-export { save, saveMix, savePlaylist, getSaved, getSavedMixes, findSavedMix, getSavedPlaylists };
+function deleteSavedPlaylist(playlistInfo: SavedPlaylistInfo) {
+    console.log('Deleting playlist from library:', playlistInfo);
+}
+
+function deleteSavedMix(title: string) {
+    console.log('Deleting mix from library:', title);
+}
+
+export {
+    save,
+    saveMix,
+    savePlaylist,
+    getSaved,
+    getSavedMixes,
+    findSavedMix,
+    getSavedPlaylists,
+    deleteSavedMix,
+    deleteSavedPlaylist
+};
 export type { SavedPlaylistInfo, SavedMixInfo, SavedMix, Library };

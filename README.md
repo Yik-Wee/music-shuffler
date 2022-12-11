@@ -11,7 +11,6 @@
   - ID stored must be the request path `url` / `permalink_url` ~~OR the id e.g. 118270473 and request sent to the widget endpoint.~~
   - use `last_modified` as the etag
   - https://github.com/skdhg/soundcloud-scraper
-  - [ ] Custom hash function for hashing soundcloud playlists into etag?
 - [ ] Deal with deleted videos server side
 
 ## Frontend
