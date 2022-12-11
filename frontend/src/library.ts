@@ -197,12 +197,51 @@ async function getSaved(): Promise<Library> {
     };
 }
 
+/**
+ * Delete the specified playlist from the library
+ * @param playlistInfo the specified playlist
+ */
 function deleteSavedPlaylist(playlistInfo: SavedPlaylistInfo) {
     console.log('Deleting playlist from library:', playlistInfo);
+
+    let saved = getSavedPlaylists();
+    if (!saved) {
+        return;
+    }
+
+    let idx = saved.findIndex(({ id, platform }) => {
+        return id === playlistInfo.id && platform === playlistInfo.platform;
+    });
+
+    if (idx === -1) {
+        return;
+    }
+
+    saved.splice(idx, 1);
+    let newSaved = JSON.stringify(saved);
+    localStorage.setItem(PLAYLISTS_KEY, newSaved);
 }
 
+/**
+ * Delete the specified mix from the library
+ * @param title the title of the mix
+ */
 function deleteSavedMix(title: string) {
     console.log('Deleting mix from library:', title);
+
+    let saved = getSavedMixes();
+    if (!saved) {
+        return;
+    }
+
+    let idx = saved.findIndex(mix => mix.title === title);
+    if (idx === -1) {
+        return;
+    }
+
+    saved.splice(idx, 1);
+    let newSaved = JSON.stringify(saved);
+    localStorage.setItem(MIXES_KEY, newSaved);
 }
 
 export {
