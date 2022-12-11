@@ -1,29 +1,28 @@
+<!-- @component
+Renders the `PlaylistCard` that can be selected and unselected on click.
+ -->
 <script lang="ts">
-    import type { PlaylistInfoResponse } from '../../types/PlaylistTracks';
     import PlaylistCard from '../../components/PlaylistCard.svelte';
-    import type { SavedPlaylistInfo } from '../../library';
 
-    export let playlistInfo: PlaylistInfoResponse;
-    let { playlist_id, platform, title, owner, thumbnail } = playlistInfo;
-    // export let title: string;
-    // export let owner: string;
-    // export let thumbnail: string;
-
-    export let intoItem = (): any => {
-        return {
-            id: playlist_id,
-            platform,
-        };
-    };
+    export let title: string;
+    export let owner: string;
+    export let thumbnail: string;
 
     /** The list of items that will add or remove the current item */
     export let selectedlist: any[];
-    // export let selectedlist: SavedPlaylistInfo[];
-    
+
+    /** The current item that will be added or removed from the `selectedlist` on click */
+    export let item: any;
+
+    /** The colour of the card when selected */
     export let colorSelected: string = 'greenyellow';
+
+    /** The colour of the card when unselected */
     export let colorUnselected: string = 'whitesmoke';
 
     let selected: boolean = false;
+
+    /** This item's index in the `selectedlist` */
     let idx: number = -1;
 </script>
 
@@ -37,18 +36,12 @@
         {thumbnail}
         on:click={() => {
             if (selected) {
-                // let idx = selectedlist.findIndex((info) => {
-                //     return info.id === playlist_id && info.platform === platform;
-                // });
-
-                // if (idx === -1) {
-                //     return;
-                // }
-
+                // unselect the item - remove the item from the selectedlist with its index
                 selectedlist.splice(idx, 1);
                 selected = false;
             } else {
-                selectedlist.push(intoItem());
+                // select the item - push to selectedlist
+                selectedlist.push(item);
                 idx = selectedlist.length - 1;
                 selected = true;
             }

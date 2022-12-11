@@ -22,7 +22,8 @@
         <SelectablePlaylistCard
             selectedlist={selectedPlaylists}
             colorSelected="red"
-            {playlistInfo}
+            item={playlistInfo}
+            {...playlistInfo}
         />
         {/each}
 </div>
@@ -33,21 +34,10 @@
         <SelectablePlaylistCard
             selectedlist={selectedMixTitles}
             colorSelected="red"
-            playlistInfo={{
-                title: mixInfo.title,
-                owner: 'Me',
-                thumbnail: '/assets/jammies.gif',
-                platform: '',
-                playlist_id: '',
-                description: '',
-                etag: '',
-                length: -1,
-            }}
-            intoItem={() => {
-                return {
-                    title: mixInfo.title,
-                }
-            }}
+            item={mixInfo.title}
+            title={mixInfo.title}
+            owner="Me"
+            thumbnail="/assets/jammies.gif"
         />
     {/each}
 </div>

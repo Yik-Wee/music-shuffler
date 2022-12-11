@@ -44,7 +44,8 @@
     {#each library.playlists as playlistInfo}
         <SelectablePlaylistCard
             selectedlist={newMix.playlists}
-            {playlistInfo}
+            item={playlistInfo}
+            {...playlistInfo}
         />
     {/each}
     <button disabled>Edit</button>

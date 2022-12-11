@@ -53,7 +53,11 @@
     <h1>Saved Playlists</h1>
     <div class="library-area">
         {#each playlists as playlistInfo}
-            <SelectablePlaylistCard selectedlist={newMix.playlists} {playlistInfo} />
+            <SelectablePlaylistCard
+                selectedlist={newMix.playlists}
+                item={playlistInfo}
+                {...playlistInfo}
+            />
         {/each}
         <button disabled>Edit</button>
     </div>
