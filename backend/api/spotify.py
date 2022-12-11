@@ -6,6 +6,8 @@ https://developer.spotify.com/documentation/web-api/reference/#/operations/get-p
 
 from typing import Optional, Union
 from .base import PlatformApi, Playlist, PlaylistInfo
+import requests
+
 
 class SpotifyApi(PlatformApi):
     def __init__(self, client_id: str, client_secret: str) -> None:
@@ -18,6 +20,9 @@ class SpotifyApi(PlatformApi):
         playlist_id: str,
         playlist_info: Optional[PlaylistInfo] = None
     ) -> Union[Playlist, None]:
+        # requests.get('', headers={
+        #     'Authorization': 
+        # })
         pass
 
     def playlist_info(self, playlist_id: str) -> Union[str, None]:

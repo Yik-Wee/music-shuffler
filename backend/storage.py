@@ -171,8 +171,7 @@ class PlaylistCollection(Collection):
         Column('Owner'),
         Column('Description', default='', is_required=False),
         Column('Thumbnail', default='', is_required=False),
-        # -1 if no PlaylistTracks stored yet
-        Column('Length', default=-1, is_required=False),
+        Column('Length'),
         Column('Etag', is_required=False),
         Column('Platform'),
     ]

@@ -162,19 +162,19 @@ def api_full_playlist(platform: str):
         if len(result.value) == 0:
             cached_record = None
             cached_etag = None
-            use_cache = False
+            # use_cache = False
         else:
             cached_record = result.value[0]
             cached_etag = cached_record['Etag']
-            if cached_record['Length'] == -1:
-                use_cache = False
-            else:
-                use_cache = etag == cached_etag
+            # if cached_record['Length'] == -1:
+            #     use_cache = False
+            # else:
+            #     use_cache = etag == cached_etag
 
         # same etag means playlist contents are unchanged
         # get playlist contents from cache
-        # if etag == cached_etag:
-        if use_cache:
+        # if use_cache:
+        if etag == cached_etag:
             playlist_tracks_coll = colls['PlaylistTracks']
             result = playlist_tracks_coll.find(record)
             if not result.ok:
