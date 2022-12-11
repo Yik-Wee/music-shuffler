@@ -1,14 +1,16 @@
 <!-- @component
+Renders the library item as a card (playlist or mix)
+
 # Styling
 * `--width`: width of the card
 * `--height`: height of the card
 * `--lines`: number of lines on `title` and `owner` text until it overflows into ellipsis
 
 # Props
-* `title`: title of the playlist
-* `owner`: the owner of the playlist
+* `title`: title of the playlist/mix
+* `owner`: the owner of the playlist/mix
 * `thumbnail`: the playlist's thumbnail. Set to empty string `''` by default if no thumbnail
-* `editable`: whether the playlist card title should be able to be edited
+* `editable`: whether the card title should be able to be edited
 
 # Events
 * `on:click`: called when the card is clicked

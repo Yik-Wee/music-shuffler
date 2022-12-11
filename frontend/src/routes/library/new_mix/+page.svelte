@@ -1,7 +1,7 @@
 <script lang="ts">
     import { getSaved, getSavedMixes, save, type Library, type SavedMixInfo } from '../../../library';
-    import PlaylistCard from '../../../components/PlaylistCard.svelte';
-    import SelectablePlaylistCard from '../SelectablePlaylistCard.svelte';
+    import LibraryItem from '../../../components/LibraryItem.svelte';
+    import SelectableLibraryItem from '../../../components/SelectableLibraryItem.svelte';
     import { goto } from '$app/navigation';
     import { onMount } from 'svelte';
 
@@ -42,7 +42,7 @@
 <h1>Saved Playlists</h1>
 <div class="library-area">
     {#each library.playlists as playlistInfo}
-        <SelectablePlaylistCard
+        <SelectableLibraryItem
             selectedlist={newMix.playlists}
             item={playlistInfo}
             {...playlistInfo}
@@ -53,7 +53,7 @@
 
 <h1>New Mix</h1>
 <div class="library-area disabled">
-    <PlaylistCard
+    <LibraryItem
         title=""
         owner="Me"
         thumbnail="/assets/jammies.gif"
@@ -74,7 +74,7 @@
                 console.log(isValidTitle);
             }}
         />
-    </PlaylistCard>
+    </LibraryItem>
 
     <button
         on:click={() => {
@@ -123,6 +123,24 @@
     .library-area.disabled > :global(.playlist-card:not(.enabled)) {
         pointer-events: none;
         opacity: 0.5;
+    }
+
+    .mix-title-input {
+        outline: 0;
+        border: 0;
+        border-bottom: 2px solid lightskyblue;
+        transition: all 200ms ease-in-out;
+    }
+
+    .mix-title-input:focus,
+    .mix-title-input:hover {
+        border-bottom: 2px solid blue;
+    }
+
+    .mix-title-input.error,
+    .mix-title-input.error:focus,
+    .mix-title-input.error:hover {
+        border-bottom: 2px solid red;
     }
 
     .mix-error-message {

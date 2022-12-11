@@ -1,8 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    // import LibraryRenderer from './Library.svelte';
     import { getSaved, type Library } from '../../library';
-    import PlaylistCard from '../../components/PlaylistCard.svelte';
+    import LibraryItem from '../../components/LibraryItem.svelte';
     import { goto } from '$app/navigation';
 
     let library: Library = {
@@ -21,7 +20,7 @@
 <h1>Saved Playlists</h1>
 <div class="library-area">
     {#each library.playlists as playlistInfo}
-        <PlaylistCard
+        <LibraryItem
             {...playlistInfo}
             on:click={() => goto(
                 `/playlist/${playlistInfo.platform.toLowerCase()}?id=${playlistInfo.playlist_id}`
@@ -33,7 +32,7 @@
 <h1>Saved Mixes</h1>
 <div class="library-area">
     {#each library.mixes as mixInfo}
-        <PlaylistCard
+        <LibraryItem
             title={mixInfo.title}
             owner="Me"
             thumbnail="/assets/jammies.gif"
@@ -41,7 +40,7 @@
         />
     {/each}
 
-    <PlaylistCard
+    <LibraryItem
         title="Add Mix"
         owner=""
         thumbnail="/assets/plus.svg"
@@ -56,31 +55,4 @@
         row-gap: 10px;
         column-gap: 10px;
     }
-
-    /* .library-area.disabled > :global(.playlist-card:not(.enabled)) {
-        pointer-events: none;
-        opacity: 0.5;
-    }
-
-    .mix-title-input {
-        outline: 0;
-        border: 0;
-        border-bottom: 2px solid lightskyblue;
-        transition: all 200ms ease-in-out;
-    }
-
-    .mix-title-input:focus,
-    .mix-title-input:hover {
-        border-bottom: 2px solid blue;
-    }
-
-    .mix-title-input.error,
-    .mix-title-input.error:focus,
-    .mix-title-input.error:hover {
-        border-bottom: 2px solid red;
-    }
-
-    .mix-error-message {
-        color: red;
-    } */
 </style>

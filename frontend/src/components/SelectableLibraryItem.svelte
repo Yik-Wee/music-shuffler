@@ -2,7 +2,7 @@
 Renders the `PlaylistCard` that can be selected and unselected on click.
  -->
 <script lang="ts">
-    import PlaylistCard from '../../components/PlaylistCard.svelte';
+    import PlaylistCard from './LibraryItem.svelte';
 
     export let title: string;
     export let owner: string;
@@ -20,30 +20,30 @@ Renders the `PlaylistCard` that can be selected and unselected on click.
     /** The colour of the card when unselected */
     export let colorUnselected: string = 'whitesmoke';
 
-    let selected: boolean = false;
+    let isSelected: boolean = false;
 
     /** This item's index in the `selectedlist` */
     let idx: number = -1;
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<div class:selected>
+<div class:isSelected>
     <PlaylistCard
         --bg-colour-hover="var(--bg-colour)"
-        --bg-colour={selected ? colorSelected : colorUnselected}
+        --bg-colour={isSelected ? colorSelected : colorUnselected}
         {title}
         {owner}
         {thumbnail}
         on:click={() => {
-            if (selected) {
+            if (isSelected) {
                 // unselect the item - remove the item from the selectedlist with its index
                 selectedlist.splice(idx, 1);
-                selected = false;
+                isSelected = false;
             } else {
                 // select the item - push to selectedlist
                 selectedlist.push(item);
                 idx = selectedlist.length - 1;
-                selected = true;
+                isSelected = true;
             }
         }}
     />

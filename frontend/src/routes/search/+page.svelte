@@ -3,7 +3,7 @@
     import { onMount } from 'svelte';
     import { isErrorResponse, type PlaylistInfoResponse } from '../../types/PlaylistTracks';
     import { getPlaylistInfo } from '../../requests';
-    import PlaylistCard from '../../components/PlaylistCard.svelte';
+    import PlaylistCard from '../../components/LibraryItem.svelte';
     import { afterNavigate, goto } from '$app/navigation';
     import { SoundCloud } from '../../url';
 
