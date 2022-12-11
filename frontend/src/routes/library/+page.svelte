@@ -16,6 +16,8 @@
     });
 </script>
 
+<a href="/library/edit">Edit Library</a>
+
 <h1>Saved Playlists</h1>
 <div class="library-area">
     {#each library.playlists as playlistInfo}
@@ -26,9 +28,6 @@
             )}
         />
     {/each}
-    <a href="/library/edit">
-        <button>Edit</button>
-    </a>
 </div>
 
 <h1>Saved Mixes</h1>
