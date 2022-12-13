@@ -53,6 +53,7 @@ def api_playlist_info(platform: str):
         'PlaylistID': playlist_id,
     })
 
+    # found in cache
     if res.ok and len(res.value) == 1:
         playlist_info = res.value[0]
         print_blue(f'Found Playlist {playlist_info["Title"]} with PlaylistID {playlist_id} in cache')
@@ -111,13 +112,7 @@ def api_full_playlist(platform: str):
     # request API endpoint for playlist etag
     print_blue(
         f'({platform}) Fetching playlist_info(playlist_id={playlist_id})')
-    # playlist_info = api.playlist_info(playlist_id)
-    response, status_code = api_playlist_info(platform.lower())
-    if status_code == 404:
-        return response, status_code
-
-    playlist_info = response
-    print(playlist_info)
+    playlist_info = api.playlist_info(playlist_id)
 
     # playlist does not exist
     if playlist_info is None:
@@ -166,19 +161,21 @@ def api_full_playlist(platform: str):
         if len(result.value) == 0:
             cached_record = None
             cached_etag = None
-            # use_cache = False
+            use_cache = False
         else:
             cached_record = result.value[0]
             cached_etag = cached_record['Etag']
-            # if cached_record['Length'] == -1:
-            #     use_cache = False
-            # else:
-            #     use_cache = etag == cached_etag
+            playlist_tracks_coll = colls['PlaylistTracks']
+            result = playlist_tracks_coll.find(record)
+            if not result.ok or len(result.value) == 0 and playlist_info['length'] != 0:
+                use_cache = False
+            else:
+                # same etag means playlist contents are unchanged
+                use_cache = etag == cached_etag
 
-        # same etag means playlist contents are unchanged
         # get playlist contents from cache
-        # if use_cache:
-        if etag == cached_etag:
+        if use_cache:
+            print_blue(f'Matching etags: {etag}. Using cache')
             playlist_tracks_coll = colls['PlaylistTracks']
             result = playlist_tracks_coll.find(record)
             if not result.ok:
