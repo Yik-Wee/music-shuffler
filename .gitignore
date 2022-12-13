@@ -14,5 +14,5 @@ pyenv-dev/
 # databases
 **/*.db
 
-# jupyter notebook files for debugging
-**/*.debug.ipynb
+# files for debugging e.g. jupyter notebook
+**/*.debug.*
