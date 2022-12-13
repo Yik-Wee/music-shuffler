@@ -14,6 +14,12 @@ class SpotifyApi(PlatformApi):
         super().__init__(platform='SPOTIFY')
         self.client_id = client_id
         self.client_secret = client_secret
+        self.cached_token = None
+        self.expires = None
+
+    def get_token(self) -> str:
+        # ...
+        pass
 
     def playlist(
         self,

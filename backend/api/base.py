@@ -19,7 +19,25 @@ class Track(TypedDict):
     title: str
     owner: str
     thumbnail: str
-    duration_seconds: int
+    duration_seconds: Union[int, None]
+
+
+def into_track(
+    track_id: str,
+    platform: str,
+    title: str,
+    owner: str,
+    thumbnail: str,
+    duration_seconds: Optional[int] = None
+) -> Track:
+    return {
+        'track_id': track_id,
+        'platform': platform,
+        'title': title,
+        'owner': owner,
+        'thumbnail': thumbnail,
+        'duration_seconds': duration_seconds,
+    }
 
 
 class PlaylistInfo(TypedDict):
@@ -47,6 +65,28 @@ class PlaylistInfo(TypedDict):
     length: int
 
 
+def into_playlist_info(
+    platform: str,
+    playlist_id: str,
+    title: str,
+    owner: str,
+    description: str,
+    thumbnail: str,
+    etag: str,
+    length: int
+) -> PlaylistInfo:
+    return {
+        'platform': platform,
+        'playlist_id': playlist_id,
+        'title': title,
+        'owner': owner,
+        'description': description,
+        'thumbnail': thumbnail,
+        'etag': etag,
+        'length': length,
+    }
+
+
 class Playlist(PlaylistInfo):
     '''
     ```
@@ -63,8 +103,14 @@ class Playlist(PlaylistInfo):
     }
     ```
     '''
-    # length: int
     tracks: List[Track]
+
+
+def into_playlist(playlist_info: PlaylistInfo, tracks: List[Track]) -> Playlist:
+    return {
+        **playlist_info,
+        'tracks': tracks,
+    }
 
 
 class PlatformApi:
