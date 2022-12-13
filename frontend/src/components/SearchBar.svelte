@@ -4,6 +4,7 @@
     let search: HTMLAnchorElement;
     let url: string = '';
     let parsedUrl: ParsedUrl | null = null;
+    let href: string = getHref();
 
     function getHref(): string {
         if (parsedUrl === null) {
@@ -26,7 +27,10 @@
         on:input={() => {
             url = url.trim();
             parsedUrl = parse(url);
-            console.log(parsedUrl);
+            href = getHref();
+
+            console.log({ parsedUrl });
+            console.log({ href });
         }}
         on:keydown={({ key }) => {
             if (key === 'Enter') {
@@ -36,7 +40,7 @@
     />
 
     <div class="search-button-container">
-        <a class="search-button" href={getHref()} bind:this={search}>👌</a>
+        <a class="search-button" {href} bind:this={search}>👌</a>
     </div>
 </div>
 
