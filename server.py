@@ -44,6 +44,9 @@ def api_playlist_info(platform: str):
     platform = platform.upper()
     api = platform_apis[platform]
 
+    # resolve playlist_id to standardised playlist id (specifically for soundcloud)
+    playlist_id = api.resolve_playlist_id(playlist_id)
+
     # check cache
     res = colls['Playlist'].find({
         'Platform': platform,
@@ -103,6 +106,7 @@ def api_full_playlist(platform: str):
 
     platform = platform.upper()
     api = platform_apis[platform]
+    playlist_id = api.resolve_playlist_id(playlist_id)
 
     # request API endpoint for playlist etag
     print_blue(

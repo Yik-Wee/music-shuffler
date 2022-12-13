@@ -137,6 +137,9 @@ class PlatformApi:
     def __init__(self, platform: str) -> None:
         self.platform = platform
 
+    def resolve_playlist_id(self, playlist_id: str) -> str:
+        return playlist_id.strip()
+
     def playlist(
         self,
         playlist_id: str,

@@ -261,6 +261,22 @@ class SoundCloudApi(PlatformApi):
         playlist_data = sc_hydration[idx_playlist].get('data')
         return playlist_data
 
+    def resolve_playlist_id(self, playlist_id: str) -> str:
+        '''
+        Resolves the playlist_id (playlist request path) into the canonical (standardised) request path
+
+        Params
+        ------
+        `playlist_id`
+        - The canonical_url (request path) of the soundcloud playlist
+        '''
+        info = self.playlist_info(playlist_id)
+        # playlist not found - resolve to original playlist_id
+        if info is None:
+            return playlist_id
+
+        return info['playlist_id']
+
     def playlist(
         self,
         playlist_id: str,
