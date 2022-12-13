@@ -4,9 +4,9 @@ from typing import List, Optional, Union
 import re
 import time
 import json
-import requests
 import concurrent.futures
 from datetime import datetime, timedelta
+import requests
 from .base import (
     PlatformApi,
     Playlist,
@@ -18,7 +18,11 @@ from .base import (
 )
 
 
-class SoundCloudV2TrackResponse:
+class SoundCloudV2TrackData:
+    '''
+    Utility class to extract track data from a soundcloud api-v2 response or
+    a hydration track object
+    '''
     def __init__(self, track_response: dict) -> None:
         self.track_id = str(track_response.get('id'))
         self.title = track_response.get('title')
@@ -35,9 +39,17 @@ class SoundCloudV2TrackResponse:
             self.duration_secs = None
 
     def has_required_track_info(self):
-        return None not in (self.track_id, self.title, self.thumbnail, self.owner)
+        '''
+        Returns
+        ------
+        `true` if the track data has the `track_id`, `title` and `owner` data, `false` otherwise
+        '''
+        return None not in (self.track_id, self.title, self.owner)
 
     def into_track(self) -> Track:
+        '''
+        Convert the extracted track data into `Track` dict
+        '''
         return into_track(
             self.track_id,
             'SOUNDCLOUD',
@@ -67,7 +79,8 @@ def fetch_tracks_parallel(
     - The client id obtained for the API call
 
     `group_size`
-    - The size of each group of track ids. Each group will be fetched on separate threads (default `50`)
+    - The size of each group of track ids. Each group will be fetched on separate threads
+      (default `50`)
 
     `threads`
     - The number of threads to use (default `8`)
@@ -114,7 +127,7 @@ def fetch_tracks_parallel(
                 print(f'Future was cancelled: {err}')
             except concurrent.futures.TimeoutError as err:
                 print(f'Future was timed out: {err}')
-            except Exception as err:  # pylint-disable=broad-except
+            except Exception as err:  # pylint: disable=broad-except
                 print(f'An error occurred fetching tracks: {err}')
 
     return all_tracks
@@ -127,6 +140,31 @@ def fetch_tracks(
     retry_sleep_secs: int = 2,
     max_retries: int = 5,
 ) -> List[Track]:
+    '''
+    Warning
+    ------
+    If the number of track_ids is too large, an empty list `[]` will be returned as
+    a 400 Bad Request response will be obtained. It is best to fetch a small number
+    of `track_ids` (e.g. <50)
+
+    Params
+    ------
+    `track_ids`
+    - Track ids of all the tracks to fetch
+
+    `client_id`
+    - The client id obtained for the API call
+
+    `session`
+    - The optional `Session` object to be used for GET requests.
+      See https://requests.readthedocs.io/en/latest/user/advanced/
+
+    `retry_sleep_secs`
+    - The number of seconds to wait before retrying a failed request
+
+    `max_retries`
+    - The maximum number of retries of the failed request
+    '''
     if session is None:
         get = requests.get
     else:
@@ -153,7 +191,6 @@ def fetch_tracks(
         # 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36'
         'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
     }
-    # res = requests.get(endpoint, timeout=30, headers=headers)
     res = get(endpoint, timeout=30, headers=headers)
 
     if not res.ok:
@@ -189,7 +226,7 @@ def fetch_tracks(
 
     tracks = []
     for track_info in result:
-        track_res = SoundCloudV2TrackResponse(track_info)
+        track_res = SoundCloudV2TrackData(track_info)
         track = track_res.into_track()
         tracks.append(track)
     return tracks
@@ -263,7 +300,8 @@ class SoundCloudApi(PlatformApi):
 
     def resolve_playlist_id(self, playlist_id: str) -> str:
         '''
-        Resolves the playlist_id (playlist request path) into the canonical (standardised) request path
+        Resolves the playlist_id (playlist request path) into the canonical
+        (standardised) request path
 
         Params
         ------
@@ -355,7 +393,7 @@ class SoundCloudApi(PlatformApi):
 
         # extract prerendered track data
         for track_data in track_data_list:
-            extracted_track_data = SoundCloudV2TrackResponse(track_data)
+            extracted_track_data = SoundCloudV2TrackData(track_data)
             if extracted_track_data.has_required_track_info():
                 track = extracted_track_data.into_track()
                 all_tracks.append(track)
