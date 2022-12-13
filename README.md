@@ -1,8 +1,5 @@
 # TODO
 ## Backend
-- [ ] `YouTubeApi`: use `item['contentDetails']['itemCount']` to get `Length` field.
-  - Afterwards, the `length == -1` check can be removed
-  - https://developers.google.com/youtube/v3/docs/playlists#contentDetails.itemCount
 - [ ] Finish `SpotifyApi` and test it
   - https://developer.spotify.com/documentation/web-api/reference/#/operations/get-playlist
 - [ ] Deal with deleted videos server side
