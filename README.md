@@ -5,14 +5,6 @@
   - https://developers.google.com/youtube/v3/docs/playlists#contentDetails.itemCount
 - [ ] Finish `SpotifyApi` and test it
   - https://developer.spotify.com/documentation/web-api/reference/#/operations/get-playlist
-- [ ] `SoundCloudApi` make more efficient (multithreaded requests)
-  - https://github.com/zackradisic/soundcloud-api/blob/master/clientid.go
-  - Find the final `<script crossorigin src="..."></script>`
-  - Get the js of that src
-  - parse for `client_id`
-  - **use client_id to get token**
-  - Request SoundCloud's web API endpoint with the token
-  - Use `api-v2.soundcloud.com` as `api.soundcloud.com` requires client_secret.
 - [ ] Deal with deleted videos server side
 - [ ] **?** Ability to make custom playlists (tracks from diff platforms)
 

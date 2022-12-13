@@ -5,6 +5,7 @@ import re
 import time
 import json
 import requests
+import concurrent.futures
 from datetime import datetime, timedelta
 from .base import (
     PlatformApi,
@@ -45,6 +46,78 @@ class SoundCloudV2TrackResponse:
             self.thumbnail,
             self.duration_secs
         )
+
+
+def fetch_tracks_parallel(
+    track_ids: List[str],
+    client_id: str,
+    group_size: int = 50,
+    threads: int = 8,
+    session: Optional[requests.Session] = None,
+    retry_sleep_secs: int = 2,
+    max_retries: int = 5,
+) -> List[Track]:
+    '''
+    Params
+    ------
+    `track_ids`
+    - Track ids of all the tracks to fetch
+
+    `client_id`
+    - The client id obtained for the API call
+
+    `group_size`
+    - The size of each group of track ids. Each group will be fetched on separate threads (default `50`)
+
+    `threads`
+    - The number of threads to use (default `8`)
+
+    `session`
+    - The optional `Session` object to be used for GET requests.
+      See https://requests.readthedocs.io/en/latest/user/advanced/
+
+    `retry_sleep_secs`
+    - The number of seconds to wait before retrying a failed request
+
+    `max_retries`
+    - The maximum number of retries of the failed request
+    '''
+    # split track ids into groups
+    groups = []
+    idx = 0
+    while idx < len(track_ids):
+        group = track_ids[idx:idx+group_size]
+        groups.append(group)
+        idx += group_size
+
+    all_tracks = []
+
+    # fetch each group of tracks on diff threads
+    # https://medium.com/geekculture/python-how-to-send-100k-requests-quickly-b4ef9495620d
+    with concurrent.futures.ThreadPoolExecutor(max_workers=threads) as executor:
+        future_to_url = (
+            executor.submit(
+                fetch_tracks,
+                group,
+                client_id,
+                session,
+                retry_sleep_secs,
+                max_retries
+            ) for group in groups
+        )
+        for future in concurrent.futures.as_completed(future_to_url):
+            try:
+                # concat the results in order of track position
+                tracks = future.result()
+                all_tracks.extend(tracks)
+            except concurrent.futures.CancelledError as err:
+                print(f'Future was cancelled: {err}')
+            except concurrent.futures.TimeoutError as err:
+                print(f'Future was timed out: {err}')
+            except Exception as err:  # pylint-disable=broad-except
+                print(f'An error occurred fetching tracks: {err}')
+
+    return all_tracks
 
 
 def fetch_tracks(
@@ -264,6 +337,7 @@ class SoundCloudApi(PlatformApi):
         all_tracks: List[Track] = []
         remaining_track_ids = []
 
+        # extract prerendered track data
         for track_data in track_data_list:
             extracted_track_data = SoundCloudV2TrackResponse(track_data)
             if extracted_track_data.has_required_track_info():
@@ -272,19 +346,11 @@ class SoundCloudApi(PlatformApi):
             else:
                 remaining_track_ids.append(extracted_track_data.track_id)
 
-        # TODO Use multithreading
-        print(f'Prerendered {len(all_tracks)} tracks')
-        print(f'Fetching {len(remaining_track_ids)} tracks')
+        # fetch remaining (non-prerendered) tracks in parallel
         if len(remaining_track_ids) > 0:
-            idx = 0
-            tracks_per_req = 50
-            while idx < len(remaining_track_ids):
-                track_ids = remaining_track_ids[idx:idx+tracks_per_req]
-                print(f'fetch track_ids idx {idx} to {idx+tracks_per_req}')
-                all_tracks.extend(
-                    fetch_tracks(track_ids, self.get_client_id(), s)
-                )
-                idx += tracks_per_req
+            tracks = fetch_tracks_parallel(
+                remaining_track_ids, client_id=self.get_client_id(), session=s)
+            all_tracks.extend(tracks)
 
         playlist = into_playlist(playlist_info, all_tracks)
         return playlist
