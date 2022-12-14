@@ -12,9 +12,6 @@ from .base import (
     Playlist,
     PlaylistInfo,
     Track,
-    into_track,
-    into_playlist,
-    into_playlist_info
 )
 
 
@@ -50,13 +47,13 @@ class SoundCloudV2TrackData:
         '''
         Convert the extracted track data into `Track` dict
         '''
-        return into_track(
-            self.track_id,
-            'SOUNDCLOUD',
-            self.title,
-            self.owner,
-            self.thumbnail,
-            self.duration_secs
+        return Track(
+            track_id=self.track_id,
+            platform='SOUNDCLOUD',
+            title=self.title,
+            owner=self.owner,
+            thumbnail=self.thumbnail,
+            duration_seconds=self.duration_secs,
         )
 
 
@@ -377,15 +374,15 @@ class SoundCloudApi(PlatformApi):
             else:
                 owner = ''
 
-            playlist_info = into_playlist_info(
-                self.platform,
-                playlist_id,
-                title,
-                owner,
-                description,
-                thumbnail,
-                last_modified,
-                playlist_length,
+            playlist_info = PlaylistInfo(
+                platform=self.platform,
+                playlist_id=playlist_id,
+                title=title,
+                owner=owner,
+                description=description,
+                thumbnail=thumbnail,
+                etag=last_modified,
+                length=playlist_length,
             )
 
         all_tracks: List[Track] = []
@@ -406,7 +403,7 @@ class SoundCloudApi(PlatformApi):
                 remaining_track_ids, client_id=self.get_client_id(), session=s)
             all_tracks.extend(tracks)
 
-        playlist = into_playlist(playlist_info, all_tracks)
+        playlist = Playlist(**playlist_info, tracks=all_tracks)
         return playlist
 
     def playlist_info(self, playlist_id: str) -> Union[str, None]:
@@ -453,14 +450,14 @@ class SoundCloudApi(PlatformApi):
         else:
             owner = ''
 
-        playlist_info = into_playlist_info(
-            self.platform,
-            playlist_id,
-            title,
-            owner,
-            description,
-            thumbnail,
-            last_modified,
-            playlist_length,
+        playlist_info = PlaylistInfo(
+            platform=self.platform,
+            playlist_id=playlist_id,
+            title=title,
+            owner=owner,
+            description=description,
+            thumbnail=thumbnail,
+            etag=last_modified,
+            length=playlist_length,
         )
         return playlist_info

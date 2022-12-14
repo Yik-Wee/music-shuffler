@@ -7,7 +7,7 @@ from backend import (
     create_database,
     colls
 )
-from backend.api import Playlist, Track
+from backend.api import Playlist, PlaylistInfo, Track
 from apis import platform_apis, ALL_PLATFORMS
 from debug_utils import print_blue, print_green, print_red
 
@@ -18,7 +18,7 @@ app = Flask(__name__)
 @app.route('/', defaults={'path': 'index.html'})
 @app.route('/<path:path>', methods=['GET'])
 def index(path: str):
-    '''Serves all files from frontend/public to /'''
+    '''Serves all files from frontend/build to /'''
     try:
         print(f'path = {path}')
         return send_from_directory(BUILD_DIR, path)
@@ -56,17 +56,19 @@ def api_playlist_info(platform: str):
     # found in cache
     if res.ok and len(res.value) == 1:
         playlist_info = res.value[0]
-        print_blue(f'Found Playlist {playlist_info["Title"]} with PlaylistID {playlist_id} in cache')
+        print_blue(
+            f'Found Playlist {playlist_info["Title"]} with PlaylistID {playlist_id} in cache')
 
-        return {
-            'platform': platform,
-            'playlist_id': playlist_id,
-            'title': playlist_info['Title'],
-            'owner': playlist_info['Owner'],
-            'description': playlist_info['Description'],
-            'thumbnail': playlist_info['Thumbnail'],
-            'etag': playlist_info['Etag'],
-        }, 200
+        return PlaylistInfo(
+            platform=platform,
+            playlist_id=playlist_id,
+            title=playlist_info['Title'],
+            owner=playlist_info['Owner'],
+            description=playlist_info['Description'],
+            thumbnail=playlist_info['Thumbnail'],
+            etag=playlist_info['Etag'],
+            length=playlist_info['Length'],
+        ), 200
 
     # not found in cache, fetch from API and replace cache
     playlist_info = api.playlist_info(playlist_id)
@@ -182,28 +184,28 @@ def api_full_playlist(platform: str):
                 return {'error': f'Error fetching cached playlist. {result.err()}'}
 
             records = result.value
-            playlist: Playlist = {
-                'platform': platform,
-                'playlist_id': cached_record['PlaylistID'],
-                'title': cached_record['Title'],
-                'owner': cached_record['Owner'],
-                'description': cached_record['Description'],
-                'thumbnail': cached_record['Thumbnail'],
-                'length': cached_record['Length'],
-                'etag': etag,
-                'tracks': [],
-            }
+            playlist = Playlist(
+                platform=platform,
+                playlist_id=cached_record['PlaylistID'],
+                title=cached_record['Title'],
+                owner=cached_record['Owner'],
+                description=cached_record['Description'],
+                thumbnail=cached_record['Thumbnail'],
+                length=cached_record['Length'],
+                etag=etag,
+                tracks=[],
+            )
 
             for record in records:
                 # PlaylistID, TrackID, Platform, Position
-                track: Track = {
-                    'track_id': record['TrackID'],
-                    'platform': record['TrackPlatform'],
-                    'title': record['TrackTitle'],
-                    'owner': record['TrackOwner'],
-                    'thumbnail': record['TrackThumbnail'],
-                    'duration_seconds': record['DurationSeconds'],
-                }
+                track = Track(
+                    track_id=record['TrackID'],
+                    platform=record['TrackPlatform'],
+                    title=record['TrackTitle'],
+                    owner=record['TrackOwner'],
+                    thumbnail=record['TrackThumbnail'],
+                    duration_seconds=record['DurationSeconds'],
+                )
                 playlist['tracks'].append(track)
             return playlist
 

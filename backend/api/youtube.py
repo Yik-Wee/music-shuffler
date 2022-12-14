@@ -7,12 +7,13 @@ https://stackoverflow.com/a/65281317
 https://developers.google.com/youtube/v3/docs/playlists/list
 '''
 
-from typing import List, Optional, Union
+from typing import Any, List, Optional, Union
 import requests
 from .base import PlatformApi, Playlist, PlaylistInfo, Track
 
 
 def choose_thumbnail(all_thumbnails: dict, priority: Optional[List[str]] = None) -> str:
+    '''Choose thumbnail url based on the priority of each key'''
     if priority is None:
         priority = ['standard', 'default']
 
@@ -24,6 +25,14 @@ def choose_thumbnail(all_thumbnails: dict, priority: Optional[List[str]] = None)
             return thumbnail_url
 
     return ''
+
+
+def try_json(response: requests.Response) -> Union[Any, None]:
+    try:
+        return response.json()
+    except requests.JSONDecodeError as err:
+        print('Error decoding response', response, err)
+        return None
 
 
 class YouTubeApi(PlatformApi):
@@ -38,6 +47,30 @@ class YouTubeApi(PlatformApi):
         super().__init__(platform='YOUTUBE')
         self.api_key = api_key
 
+    def _extract_track_from(self, item: dict) -> Track:
+        all_thumbnails = item['snippet']['thumbnails']
+        thumbnail = choose_thumbnail(all_thumbnails)
+        owner = item['snippet'].get('videoOwnerChannelTitle', '')
+        track = Track(
+            track_id=item['snippet']['resourceId']['videoId'],
+            platform=self.platform,
+            title=item['snippet']['title'],
+            # deleted videos have title "Deleted video" and do not have
+            # certain fields like 'videoOwnerChannelTitle'
+            owner=owner,
+            thumbnail=thumbnail,
+            # getting duration of video requires another API call which would increase
+            # quota usage by n number of videos
+            duration_seconds=None,
+        )
+        return track
+
+    def _extract_tracks_from(self, items: List[dict]) -> List[Track]:
+        tracks = []
+        for item in items:
+            tracks.append(self._extract_track_from(item))
+        return tracks
+
     def playlist(
         self,
         playlist_id: str,
@@ -45,48 +78,25 @@ class YouTubeApi(PlatformApi):
     ) -> Union[Playlist, None]:
         # https://developers.google.com/youtube/v3/docs/playlistItems/list#usage
         playlist_id = playlist_id.strip()
-
         url = 'https://www.googleapis.com/youtube/v3/playlistItems'\
             f'?part=snippet&maxResults=50&playlistId={playlist_id}&key={self.api_key}'
 
         s = requests.Session()
-
         response = s.get(url, timeout=30)
+
         if not response.ok:
             print(f'Error fetching playlist items for playlist {playlist_id}: {response.reason}')
             return None
 
-        result = None
-        try:
-            result = response.json()
-        except requests.JSONDecodeError as err:
-            print(err)
+        result = try_json(response)
+        if result is None:
             return None
 
         next_page_token = result.get('nextPageToken')
-        length = result['pageInfo']['totalResults']
         tracks: List[Track] = []
 
         items = result['items']
-        for item in items:
-            all_thumbnails = item['snippet']['thumbnails']
-            thumbnail = choose_thumbnail(all_thumbnails)
-            owner = item['snippet'].get('videoOwnerChannelTitle', '')
-            print(owner)
-
-            track = {
-                'track_id': item['snippet']['resourceId']['videoId'],
-                'platform': self.platform,
-                'title': item['snippet']['title'],
-                # deleted videos have title "Deleted video" and do not have
-                # certain fields like 'videoOwnerChannelTitle'
-                'owner': owner,
-                'thumbnail': thumbnail,
-                # getting duration of video requires another API call which would increase
-                # quota usage by n number of videos
-                'duration_seconds': None,
-            }
-            tracks.append(track)
+        tracks.extend(self._extract_tracks_from(items))
 
         while next_page_token:
             response = s.get(f'{url}&pageToken={next_page_token}', timeout=30)
@@ -95,44 +105,18 @@ class YouTubeApi(PlatformApi):
                     f'Error fetching playlist items for playlist {playlist_id}: {response.reason}')
                 return None
 
-            result = None
-            try:
-                result = response.json()
-            except requests.JSONDecodeError as err:
-                print(err)
+            result = try_json(response)
+            if result is None:
                 return None
 
             items = result['items']
-            for item in items:
-                all_thumbnails = item['snippet']['thumbnails']
-                thumbnail = choose_thumbnail(all_thumbnails)
-                owner = item['snippet'].get('videoOwnerChannelTitle', '')
-                print(owner)
-
-                track = {
-                    'track_id': item['snippet']['resourceId']['videoId'],
-                    'platform': self.platform,
-                    'title': item['snippet']['title'],
-                    'owner': owner,
-                    'thumbnail': thumbnail,
-                    # getting duration of video requires another API call which would increase
-                    # quota usage by n number of videos
-                    'duration_seconds': None,
-                }
-                tracks.append(track)
-
+            tracks.extend(self._extract_tracks_from(items))
             next_page_token = result.get('nextPageToken')
 
         if playlist_info is None:
             playlist_info = self.playlist_info(playlist_id)
 
-        playlist_ = {
-            **playlist_info,
-            'length': length,
-            'tracks': tracks,
-        }
-        
-        return playlist_
+        return Playlist(**playlist_info, tracks=tracks)
 
     def playlist_info(self, playlist_id: str) -> Union[PlaylistInfo, None]:
         '''
@@ -150,11 +134,8 @@ class YouTubeApi(PlatformApi):
             print(f'Error fetching etag for playlist {playlist_id}: {response.reason}')
             return None
 
-        result = None
-        try:
-            result = response.json()
-        except requests.JSONDecodeError as err:
-            print(err)
+        result = try_json(response)
+        if result is None:
             return None
 
         # https://developers.google.com/youtube/v3/docs/playlists#resource
@@ -164,27 +145,16 @@ class YouTubeApi(PlatformApi):
             return None
 
         playlist_resource = items[0]
-        etag = playlist_resource['etag']
-        playlist_id = playlist_resource['id']
-
         snippet = playlist_resource['snippet']
-        title = snippet['title']
-        description = snippet['description']
-        owner = snippet['channelTitle']
 
-        all_thumbnails = snippet['thumbnails']
-        thumbnail = choose_thumbnail(all_thumbnails)
-
-        length = playlist_resource['contentDetails']['itemCount']
-
-        info = {
-            'platform': self.platform,
-            'playlist_id': playlist_id,
-            'title': title,
-            'owner': owner,
-            'description': description,
-            'thumbnail': thumbnail,
-            'etag': etag,
-            'length': length,
-        }
+        info = PlaylistInfo(
+            platform=self.platform,
+            playlist_id=playlist_resource['id'],
+            title=snippet['title'],
+            owner=snippet['channelTitle'],
+            description=snippet['description'],
+            thumbnail=choose_thumbnail(snippet['thumbnails']),
+            etag=playlist_resource['etag'],
+            length=playlist_resource['contentDetails']['itemCount'],
+        )
         return info
