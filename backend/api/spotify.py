@@ -10,11 +10,18 @@ import requests
 import base64
 from datetime import datetime, timedelta
 import time
+from enum import Enum
 
 
 def validate_id(spotify_id: str) -> bool:
     # is base 62 without whitespace (is alphanumeric)
     return spotify_id.isalnum()
+
+
+class ResponseStatus(Enum):
+    OK = 0
+    NOT_FOUND = 1
+    UNRECOVERABLE = 2
 
 
 class SpotifyCredentialManager:
@@ -74,7 +81,7 @@ class SpotifyApi(PlatformApi):
         self.cached_token = None
         self.expires = None
 
-    def _fetch_endpoint(self, endpoint: str) -> requests.Response:
+    def __fetch_endpoint(self, endpoint: str) -> requests.Response:
         debug_origin = '[SpotifyApi._fetch_playlist_info_endpoint()]'
         token = self.credentials.get_token()
         if not token:
@@ -101,6 +108,68 @@ class SpotifyApi(PlatformApi):
         ...
         return ...
 
+    def __handle_status_codes(self, res: requests.Response, __max_retries=3, __retries=0) -> int:
+        if __retries >= __max_retries:
+            return ResponseStatus.UNRECOVERABLE
+
+        url = res.url
+        print(f'Handling response from {url}: {res}')
+
+        if res.status_code == 401:
+            # expired token. generate new token
+            print('Bad or expired token. Retrying with a new token')
+            res = self.__fetch_endpoint(url)
+
+        if res.status_code == 400:
+            # invalid ID/bad request
+            error_obj = try_json(res)
+
+            if error_obj is None or not isinstance(error_obj, dict) or error_obj.get('error') is None:
+                print('Bad request')
+            else:
+                error_msg = error_obj.get('error').get('message', '(no details provided by API response)')
+                print(f'Bad request: {error_msg}')
+            return ResponseStatus.UNRECOVERABLE
+
+        if res.status_code == 403:
+            # Bad OAuth request. This shouldn't happen
+            print('Bad OAuth request (wrong consumer key, bad nonce, expired timestamp...)')
+            return ResponseStatus.UNRECOVERABLE
+
+        if res.status_code == 429:
+            # Too many requests
+            retry_in_seconds = 15
+            print(f'Rate limit exceeded (too many requests). Retrying in {retry_in_seconds}s...')
+            time.sleep(retry_in_seconds)
+            res = self.__fetch_endpoint(url)
+            # recursively handle the response up to the specified number of __max_retries
+            return self.__handle_status_codes(res, __retries+1)
+
+        if res.status_code == 404:
+            # not found
+            print('Not found')
+            return ResponseStatus.NOT_FOUND
+
+        # https://developer.spotify.com/documentation/web-api/#response-status-codes
+        if res.status_code == 500:
+            # internal server error
+            print('Spotify API encountered an internal server error')
+            return ResponseStatus.UNRECOVERABLE
+
+        if res.status_code == 502:
+            print('Spotify API encounrered a Bad Gateway')
+            return ResponseStatus.UNRECOVERABLE
+
+        if res.status_code == 503:
+            print('Spotify API temporarily unavailable')
+            return ResponseStatus.UNRECOVERABLE
+
+        if not res.ok:
+            print(f'Spotify API (endpoint {url}) responded with status {res.status_code}: {res.text}')
+            return ResponseStatus.UNRECOVERABLE
+
+        return ResponseStatus.OK
+
     def playlist_info(self, playlist_id: str) -> Union[str, None]:
         # https://developer.spotify.com/documentation/web-api/reference/#/operations/get-playlist
         playlist_id = playlist_id.strip()
@@ -109,38 +178,16 @@ class SpotifyApi(PlatformApi):
 
         debug_origin = '[SpotifyApi.playlist_info()]'
         url = f'https://api.spotify.com/v1/playlists/{playlist_id}'
-        res = self._fetch_endpoint(url)
+        res = self.__fetch_endpoint(url)
 
-        if res.status_code == 400:
-            # invalid ID/bad request
+        status = self.__handle_status_codes(res)
+        if status == ResponseStatus.UNRECOVERABLE:
             return None
 
-        if res.status_code == 401:
-            # expired token. generate new token
-            res = self._fetch_endpoint(url)
-
-        if res.status_code == 403:
-            # Bad OAuth request. This shouldn't happen
-            print(f'{debug_origin} Bad OAuth request (wrong consumer key, bad nonce, expired timestamp...)')
-            return None
-
-        if res.status_code == 429:
-            # Too many requests
-            retry_in_seconds = 15
-            print(f'{debug_origin} Rate limit exceeded (too many requests). Retrying in {retry_in_seconds}s...')
-            time.sleep(retry_in_seconds)
-            res = self._fetch_endpoint(url)
-            if not res.ok:
-                print(f'{debug_origin} (after retry) API responded with status {res.status_code}: {res.text}')
-                return None
-
-        if res.status_code == 404:
+        if status == ResponseStatus.NOT_FOUND:
             # playlist not found. Try album
             print(f'{debug_origin} /playlist/{playlist_id} not found. Trying with album endpoint')
             return self.album_info(playlist_id)
-
-        if not res.ok:
-            print(f'{debug_origin} API responded with status {res.status_code}: {res.text}')
 
         result = try_json(res)
         if not result or not isinstance(result, dict):
@@ -187,37 +234,15 @@ class SpotifyApi(PlatformApi):
 
         debug_origin = '[SpotifyApi.album_info()]'
         url = f'https://api.spotify.com/v1/albums/{album_id}'
-        res = self._fetch_endpoint(url)
+        res = self.__fetch_endpoint(url)
 
-        if res.status_code == 400:
-            # invalid ID/bad request
+        status = self.__handle_status_codes(res)
+        if status == ResponseStatus.UNRECOVERABLE:
             return None
 
-        if res.status_code == 401:
-            # expired token. generate new token
-            res = self._fetch_endpoint(url)
-
-        if res.status_code == 403:
-            # Bad OAuth request. This shouldn't happen
-            print(f'{debug_origin} Bad OAuth request (wrong consumer key, bad nonce, expired timestamp...)')
-            return None
-
-        if res.status_code == 429:
-            # Too many requests
-            print(f'{debug_origin} Rate limit exceeded (too many requests). Retrying in 10s...')
-            time.sleep(10)
-            res = self._fetch_endpoint(url)
-            if not res.ok:
-                print(f'{debug_origin} (after retry) API responded with status {res.status_code}: {res.text}')
-                return None
-
-        if res.status_code == 404:
-            # playlist not found. Try album
+        if status == ResponseStatus.NOT_FOUND:
             print(f'{debug_origin} /album/{album_id} not found')
             return None
-
-        if not res.ok:
-            print(f'{debug_origin} API responded with status {res.status_code}: {res.text}')
 
         result = try_json(res)
         if not result or not isinstance(result, dict):
