@@ -8,10 +8,25 @@
 
     export let position: number;
 
-    // duration in min:ss
-    let durationString: string = duration_seconds
-        ? `${Math.floor(duration_seconds / 60)}:${duration_seconds % 60}`
-        : '';
+    function fmtDuration(seconds: number): string {
+        let date = new Date(seconds * 1000);
+        let hrs = date.getUTCHours();
+        let min = date.getUTCMinutes();
+        let secs = date.getUTCSeconds();
+
+        let minStr = min.toString().padStart(2, '0');
+        let secsStr = secs.toString().padStart(2, '0');
+
+        let fmt = `${minStr}:${secsStr}`;
+        if (hrs > 0) {
+            let hrsStr = hrs.toString().padStart(2, '0');
+            fmt = `${hrsStr}:${fmt}`;
+        }
+        return fmt;
+    }
+
+    // duration in hrs:mm:ss
+    let durationString: string = duration_seconds ? fmtDuration(duration_seconds) : '';
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
