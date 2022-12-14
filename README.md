@@ -10,6 +10,7 @@
 ## Frontend
 - [ ] Add lazy loading to track-renderer containers to speed up re-rendering of shuffled queue
   - https://css-tricks.com/lazy-loading-images-in-svelte/
+- [ ] Cache the queue and last played track
 - [ ] Search function to find a track in the playlist/queue
 - [ ] Add styling to frontend
 - [ ] **?** Deal with unavailable youtube videos e.g. countdown, skip in 5s or something
