@@ -1,4 +1,5 @@
-from typing import List, Optional, TypedDict, Union
+from typing import Any, List, Optional, TypedDict, Union
+import requests
 
 
 class Track(TypedDict):
@@ -107,3 +108,18 @@ class PlatformApi:
         The `PlaylistInfo` which doesn't include fields `tracks` or `length`
         '''
         raise NotImplementedError()
+
+
+def try_json(response: requests.Response) -> Union[Any, None]:
+    '''
+    Convert the response to json
+
+    Return
+    ------
+    `None` if invalid invalid json, or the parsed json object if successful
+    '''
+    try:
+        return response.json()
+    except requests.JSONDecodeError as err:
+        print('Error decoding response', response, err)
+        return None

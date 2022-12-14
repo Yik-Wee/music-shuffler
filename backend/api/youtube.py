@@ -7,9 +7,9 @@ https://stackoverflow.com/a/65281317
 https://developers.google.com/youtube/v3/docs/playlists/list
 '''
 
-from typing import Any, List, Optional, Union
+from typing import List, Optional, Union
 import requests
-from .base import PlatformApi, Playlist, PlaylistInfo, Track
+from .base import PlatformApi, Playlist, PlaylistInfo, Track, try_json
 
 
 def choose_thumbnail(all_thumbnails: dict, priority: Optional[List[str]] = None) -> str:
@@ -25,14 +25,6 @@ def choose_thumbnail(all_thumbnails: dict, priority: Optional[List[str]] = None)
             return thumbnail_url
 
     return ''
-
-
-def try_json(response: requests.Response) -> Union[Any, None]:
-    try:
-        return response.json()
-    except requests.JSONDecodeError as err:
-        print('Error decoding response', response, err)
-        return None
 
 
 class YouTubeApi(PlatformApi):

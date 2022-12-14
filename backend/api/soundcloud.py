@@ -242,7 +242,6 @@ class SoundCloudApi(PlatformApi):
             print(f'use cached client_id: {self._client_id}')
             return self._client_id
 
-        print('fetch client_id')
         scripts_re = r'<script crossorigin src=\"(.+)\"><\/script>'
         res = requests.get('https://soundcloud.com', timeout=2)
         if not res.ok:
