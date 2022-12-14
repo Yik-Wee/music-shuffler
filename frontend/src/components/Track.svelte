@@ -9,19 +9,19 @@
     export let position: number;
 
     function fmtDuration(seconds: number): string {
-        let date = new Date(seconds * 1000);
-        let hrs = date.getUTCHours();
-        let min = date.getUTCMinutes();
-        let secs = date.getUTCSeconds();
+        const hrs = Math.floor(seconds / 3600);
+        const mins = Math.floor((seconds % 3600) / 60);
+        const secs = Math.round(seconds % 60);
 
-        let minStr = min.toString().padStart(2, '0');
+        let hrsStr = hrs.toString().padStart(2, '0');
+        let minsStr = mins.toString().padStart(2, '0');
         let secsStr = secs.toString().padStart(2, '0');
 
-        let fmt = `${minStr}:${secsStr}`;
+        let fmt = `${minsStr}:${secsStr}`;
         if (hrs > 0) {
-            let hrsStr = hrs.toString().padStart(2, '0');
             fmt = `${hrsStr}:${fmt}`;
         }
+
         return fmt;
     }
 
