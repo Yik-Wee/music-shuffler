@@ -1,7 +1,5 @@
 # TODO
 ## Backend
-- [ ] Finish `SpotifyApi` and test it
-  - https://developer.spotify.com/documentation/web-api/reference/#/operations/get-playlist
 - [ ] Deal with deleted videos server side
 - [ ] Clean up code
 - [ ] **?** Ability to make custom playlists (tracks from diff platforms)
