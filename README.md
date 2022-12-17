@@ -14,9 +14,6 @@
 - [ ] **?** Deal with unavailable youtube videos e.g. countdown, skip in 5s or something
 - [ ] **?** Add settings
 
-## Misc
-- [ ] Fix text decoding/encoding issues e.g. Soundcloud track ID 344005594 title displayed wrongly
-
 # TODO Maybe
 - [ ] Use 206 partial response with flask API routes, using `yield` and `generator(), ...`
   - Reference: https://flask.palletsprojects.com/en/2.2.x/patterns/streaming/
