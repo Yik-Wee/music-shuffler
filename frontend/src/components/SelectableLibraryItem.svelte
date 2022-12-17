@@ -8,11 +8,13 @@ Renders the `PlaylistCard` that can be selected and unselected on click.
     export let owner: string;
     export let thumbnail: string;
 
+    type T = $$Generic;
+
     /** The list of items that will add or remove the current item */
-    export let selectedlist: any[];
+    export let selectedlist: T[];
 
     /** The current item that will be added or removed from the `selectedlist` on click */
-    export let item: any;
+    export let item: T;
 
     /** The colour of the card when selected */
     export let colorSelected: string = 'greenyellow';

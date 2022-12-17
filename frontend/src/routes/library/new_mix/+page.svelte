@@ -44,7 +44,10 @@
     {#each library.playlists as playlistInfo}
         <SelectableLibraryItem
             selectedlist={newMix.playlists}
-            item={playlistInfo}
+            item={{
+                platform: playlistInfo.platform,
+                id: playlistInfo.playlist_id,
+            }}
             {...playlistInfo}
         />
     {/each}
@@ -70,8 +73,6 @@
                 if (!isValidTitle) {
                     newMixError = 'Mix title must be unique';
                 }
-
-                console.log(isValidTitle);
             }}
         />
     </LibraryItem>
@@ -89,10 +90,11 @@
             }
 
             newMix.title = newMix.title.trim();
-            console.log(newMix);
-
             library.mixes.push(newMix);
             save(newMix);
+
+            console.log('Saved mix:', newMix);
+
             goto('/library');
         }}
     >
@@ -104,12 +106,6 @@
     <a href="/library">
         <button>Cancel</button>
     </a>
-    <!-- <button
-        on:click={() => {
-            // cancel and reset everything
-            goto('/library');
-        }}>Cancel</button
-    > -->
 </div>
 
 <style>

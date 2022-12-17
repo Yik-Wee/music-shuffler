@@ -138,7 +138,7 @@ namespace Spotify {
     export const RE_DOMAIN = /^(open\.|play\.|www\.)?spotify\.com$/i;
     // https://developer.spotify.com/documentation/web-api/
     // playlist ID is base-62
-    const RE_ID = /^\/?playlist\/([0-9a-zA-Z]+)\/?(?:\?.*)?$/i;
+    const RE_ID = /^\/?(?:playlist|album)\/([0-9a-zA-Z]+)\/?(?:\?.*)?$/i;
     export function parseId(path: string): string | null {
         let matches = RE_ID.exec(path);
         if (matches?.length !== 2) {

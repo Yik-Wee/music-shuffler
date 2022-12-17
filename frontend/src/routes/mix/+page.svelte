@@ -30,13 +30,14 @@
         }
 
         let savedMixInfo = findSavedMix(title);
+
         if (!savedMixInfo) {
             err = 'Mix Not Found';
             return;
         }
 
         let responses = await Promise.all(
-            savedMixInfo.playlists.map(({ platform, id }) => getPlaylist(platform, id))
+            savedMixInfo.playlists.map(({ platform, id }) => getPlaylist(platform.toLowerCase(), id))
         );
 
         mix = {
@@ -46,12 +47,18 @@
         };
 
         responses
-            .filter((res): res is PlaylistResponse => !isErrorResponse(res))
+            .filter((res): res is PlaylistResponse => {
+                let isErr = !isErrorResponse(res);
+                if (isErr) {
+                    console.error('Response error:', res);
+                }
+                return isErr;
+            })
             .forEach((playlist) => {
                 mix?.playlists.push(toPlaylistInfo(playlist));
                 mix?.tracks.push(...playlist.tracks);
             });
-    });
+        });
 </script>
 
 <div>
