@@ -342,7 +342,7 @@ class SoundCloudApi(PlatformApi):
             return None
 
         # parse the HTML for window.__sc_hydration
-        playlist_data = self.__parse_hydration(response.text)
+        playlist_data = self.__parse_hydration(response.content.decode('utf-8'))
 
         # validate playlist data parsed
         if playlist_data is None or not isinstance(playlist_data, dict):
