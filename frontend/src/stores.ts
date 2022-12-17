@@ -40,8 +40,8 @@ namespace TrackQueue {
         position: number;
         tracklist: Track[];
         // playlists: PlaylistInfoResponse[];
-        id: string,
-        platform: string,
+        id: string;
+        platform: string;
     };
 
     let queue: Queue = {
@@ -49,7 +49,7 @@ namespace TrackQueue {
         tracklist: [],
         // playlists: []
         id: '',
-        platform: '',
+        platform: ''
     };
 
     /**
@@ -59,12 +59,13 @@ namespace TrackQueue {
      * @param platform the platform of the playlist, or 'mix' if it is a mix
      */
     export function setQueue(tracklist: Track[], id: string, platform: string) {
+        pause();
         queue.tracklist = tracklist;
         queue.position = 0;
         queue.id = id;
         queue.platform = platform;
     }
-        
+
     /**
      * @returns {string} the id of the playlist or unique title of the mix in the queue
      */
@@ -73,7 +74,7 @@ namespace TrackQueue {
     }
 
     /**
-     * 
+     *
      * @returns {string} the platform of the playlist, or 'mix' if a mix is in the queue
      */
     export function platform(): string {
@@ -81,9 +82,13 @@ namespace TrackQueue {
     }
 
     /**
-     * @returns {Track} the track currently being played in the queue
+     * @returns {Track | null} the track currently being played in the queue or null if no track
      */
-    export function nowPlaying(): Track {
+    export function nowPlaying(): Track | null {
+        if (queue.position >= queue.tracklist.length || queue.position < 0) {
+            return null;
+        }
+
         return queue.tracklist[queue.position];
     }
 
@@ -98,7 +103,6 @@ namespace TrackQueue {
      * Shuffles the queue's tracklist, setting the track now playing to be the first track in the queue
      */
     export function shuffle() {
-        console.log('shuffle() start');
         let n = queue.tracklist.length - 1;
         if (n <= 0) {
             return;
@@ -113,10 +117,8 @@ namespace TrackQueue {
 
         for (let i = n; i > 1; i--) {
             let r = Math.floor(1 + Math.random() * (i - 1));
-            console.log(`swap ${i}, ${r}`);
             [queue.tracklist[i], queue.tracklist[r]] = [queue.tracklist[r], queue.tracklist[i]];
         }
-        console.log('shuffle() end');
     }
 
     /**
@@ -134,7 +136,13 @@ namespace TrackQueue {
         pause();
 
         queue.position = position;
+
+        // get track at new position
         let track = nowPlaying();
+        if (track === null) {
+            return false;
+        }
+
         let platform = track.platform.toLowerCase();
         let player = getPlayer(platform);
         switch (platform) {
@@ -178,6 +186,10 @@ namespace TrackQueue {
      */
     export function play() {
         let track = nowPlaying();
+        if (track === null) {
+            return;
+        }
+
         let platform = track.platform.toLowerCase();
         let player = getPlayer(platform);
 
@@ -199,6 +211,10 @@ namespace TrackQueue {
      */
     export function pause() {
         let track = nowPlaying();
+        if (track === null) {
+            return;
+        }
+
         let platform = track.platform.toLowerCase();
         let player = getPlayer(platform);
         switch (platform) {
@@ -219,6 +235,10 @@ namespace TrackQueue {
      */
     async function isPlaying(): Promise<boolean> {
         let track = nowPlaying();
+        if (track === null) {
+            return false;
+        }
+
         let platform = track.platform.toLowerCase();
         let player = getPlayer(platform);
         switch (platform) {

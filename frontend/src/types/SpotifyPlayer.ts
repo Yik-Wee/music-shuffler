@@ -106,6 +106,7 @@ class SpotifyPlayer {
         }
 
         if (e.data.type === 'ready') {
+            this.isPaused = true;
             this.onReady(this);
             return;
         }

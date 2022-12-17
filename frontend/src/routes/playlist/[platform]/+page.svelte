@@ -13,6 +13,8 @@
     let err: string | undefined;
     let playlist: PlaylistResponse | undefined;
 
+    let hideDesc: boolean = true;
+
     function setQueueIfQueueDiff() {
         if (
             playlist &&
@@ -56,7 +58,12 @@
             <h2>{playlist.owner}</h2>
             <h2>{playlist.title}</h2>
             <div>
-                <p class="playlist-description-ellipses">{playlist.description}</p>
+                <p class="playlist-description" class:ellipsis={hideDesc}>{playlist.description}</p>
+                {#if hideDesc}
+                    <button on:click={() => hideDesc = false}>Show More</button>
+                {:else}
+                    <button on:click={() => hideDesc = true}>Show Less</button>
+                {/if}
             </div>
             <img
                 src={playlist.thumbnail}
@@ -89,3 +96,15 @@
         />
     {/if}
 </div>
+
+<style>
+    .playlist-description {
+        white-space: pre-wrap;
+    }
+
+    .ellipsis {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+</style>
