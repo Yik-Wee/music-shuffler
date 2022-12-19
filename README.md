@@ -5,11 +5,9 @@
   - User accounts? Secure login system?
 
 ## Frontend
-- [ ] Cache the queue and last played track
-- [ ] Search function to find a track in the playlist/queue
 - [ ] Add styling to frontend
-- [ ] Prevent re-rendering of alr rendered images on shuffle
 - [ ] Reorganise & clean up code
+- [ ] Prevent re-rendering of alr rendered images on shuffle
 - [ ] **?** Deal with unavailable youtube videos e.g. countdown, skip in 5s or something
 - [ ] **?** Add settings
 
