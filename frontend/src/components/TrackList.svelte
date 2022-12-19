@@ -50,7 +50,7 @@
             trackIndices = findTrack(title);
         }}
         on:keydown={({ key }) => {
-            if (key === 'Enter') {
+            if (key === 'Enter' && searchedTitle.trim().length > 0) {
                 isSearching = true;
                 search.click();
             }
