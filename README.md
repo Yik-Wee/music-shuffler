@@ -1,6 +1,5 @@
 # TODO
 ## Backend
-- [ ] Deal with deleted videos server side
 - [ ] Clean up code
 - [ ] **?** Ability to make custom playlists (tracks from diff platforms)
   - User accounts? Secure login system?

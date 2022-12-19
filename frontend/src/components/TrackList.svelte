@@ -2,7 +2,7 @@
 <script lang="ts">
     import { TrackQueue } from '../stores';
     import type { Track as TrackType } from '../types/PlaylistTracks';
-    import Track from './Track.svelte';
+    import LazyTrack from './LazyLoader/LazyTrack.svelte';
 
     export let tracklist: TrackType[];
     /** The message to display if the tracklist is empty */
@@ -22,7 +22,7 @@
     {/if}
 
     {#each tracklist as track, position}
-        <Track
+        <LazyTrack
             {...track}
             {position}
             on:click={() => {

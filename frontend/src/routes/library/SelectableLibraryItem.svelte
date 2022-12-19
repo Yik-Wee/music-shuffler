@@ -2,7 +2,7 @@
 Renders the `PlaylistCard` that can be selected and unselected on click.
  -->
 <script lang="ts">
-    import PlaylistCard from './LibraryItem.svelte';
+    import PlaylistCard from '../../components/LibraryItem.svelte';
 
     export let title: string;
     export let owner: string;

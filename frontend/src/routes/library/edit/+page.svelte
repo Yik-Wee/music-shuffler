@@ -1,7 +1,7 @@
 <script lang="ts">
     import { getSaved, deleteSavedMix, deleteSavedPlaylist, type Library, getSavedMixes, type SavedPlaylistInfo, type SavedMix, type SavedMixInfo } from "../../../library";
     import { onMount } from "svelte";
-    import SelectableLibaryItem from "../../../components/SelectableLibraryItem.svelte";
+    import SelectableLibaryItem from "../SelectableLibraryItem.svelte";
 
     let library: Library = {
         mixes: [],
@@ -22,7 +22,10 @@
         <SelectableLibaryItem
             selectedlist={selectedPlaylists}
             colorSelected="red"
-            item={playlistInfo}
+            item={{
+                id: playlistInfo.playlist_id,
+                platform: playlistInfo.platform,
+            }}
             {...playlistInfo}
         />
         {/each}
