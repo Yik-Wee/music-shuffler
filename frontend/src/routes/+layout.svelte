@@ -2,39 +2,37 @@
     import SearchBar from '../components/SearchBar.svelte';
     import Player from '../components/Player.svelte';
     import NavBar from '../components/NavBar.svelte';
-    import { TrackQueue } from '../stores';
+    import { supportedPlatforms, TrackQueue } from '../stores';
+    import { onMount } from 'svelte';
 
     let loaded = false;
-    // dont load player every hot reload during debugging
-    let debug = false;
+    let hiddenContainer: HTMLDivElement;
 
     function onPlayerLoad(e: CustomEvent) {
         console.info(e.detail);
         loaded = true;
         TrackQueue.hideAll();
     }
+
+    onMount(() => {
+        hiddenContainer.remove();
+    });
 </script>
 
 <main>
-    {#if debug}
-        <NavBar />
-        <SearchBar />
+    <NavBar />
+    <SearchBar />
+    <Player on:load={onPlayerLoad} />
+    <div class="player-controls">
+        <button class="prev" on:click={() => TrackQueue.loadPrev()}>Prev</button>
+        <button class="toggle" on:click={() => TrackQueue.toggle()}>Play/Pause</button>
+        <button class="next" on:click={() => TrackQueue.loadNext()}>Next</button>
+    </div>
+    {#if loaded}
         <slot />
-    {:else}
-        <NavBar />
-        <SearchBar />
-        <Player on:load={onPlayerLoad} />
-        <div class="player-controls">
-            <button class="prev" on:click={() => TrackQueue.loadPrev()}>Prev</button>
-            <button class="toggle" on:click={() => TrackQueue.toggle()}>Play/Pause</button>
-            <button class="next" on:click={() => TrackQueue.loadNext()}>Next</button>
-        </div>
-        {#if loaded}
-            <slot />
-        {/if}
     {/if}
 </main>
-<div hidden>
+<div hidden bind:this={hiddenContainer}>
     <a href="/playlist/youtube">Search YouTube Playlist</a>
     <a href="/playlist/spotify">Search Spotify Playlist</a>
     <a href="/playlist/soundcloud">Search SoundCloud Playlist</a>
