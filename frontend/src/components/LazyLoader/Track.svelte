@@ -1,4 +1,6 @@
 <script lang="ts">
+    import Highlighter from './Highlighter.svelte';
+
     export let track_id: string;
     export let platform: string;
     export let title: string;
@@ -9,6 +11,9 @@
     export let position: number;
 
     export let loaded: boolean = true;
+
+    export let highlight: string = '';
+    export let highlightColor: string = 'lightgreen';
 
     function fmtDuration(seconds: number): string {
         const hrs = Math.floor(seconds / 3600);
@@ -44,10 +49,26 @@
         </div>
         <div class="ellipsis">
             <div class="ellipsis">
-                <span>{title}</span>
+                {#if highlight}
+                    <Highlighter
+                        text={title}
+                        {highlight}
+                        {highlightColor}
+                    />
+                {:else}
+                    <span>{title}</span>
+                {/if}
             </div>
             <div class="ellipsis">
-                <span>{owner}</span>
+                {#if highlight}
+                    <Highlighter
+                        text={owner}
+                        {highlight}
+                        {highlightColor}
+                    />
+                {:else}
+                    <span>{owner}</span>
+                {/if}
             </div>
         </div>
         <div class="ellipsis">

@@ -54,15 +54,6 @@
 
     .search-bar > input {
         width: 50%;
-        outline: 0;
-        border: 0;
-        border-bottom: 2px solid lightskyblue;
-        transition: all 200ms ease-in-out;
-    }
-
-    .search-bar > input:focus,
-    .search-bar > input:hover {
-        border-bottom: 2px solid blue;
     }
 
     .search-bar.error > input:focus,

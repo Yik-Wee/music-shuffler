@@ -121,18 +121,6 @@
         opacity: 0.5;
     }
 
-    .mix-title-input {
-        outline: 0;
-        border: 0;
-        border-bottom: 2px solid lightskyblue;
-        transition: all 200ms ease-in-out;
-    }
-
-    .mix-title-input:focus,
-    .mix-title-input:hover {
-        border-bottom: 2px solid blue;
-    }
-
     .mix-title-input.error,
     .mix-title-input.error:focus,
     .mix-title-input.error:hover {

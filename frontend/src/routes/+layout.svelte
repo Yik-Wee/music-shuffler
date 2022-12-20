@@ -50,6 +50,17 @@
         font-size: 13px;
     }
 
+    :global(input) {
+        outline: 0;
+        border: 0;
+        border-bottom: 2px solid lightskyblue;
+        transition: all 200ms ease-in-out;
+    }
+
+    :global(input:focus, input:hover) {
+        border-bottom: 2px solid blue;
+    }
+
     :global(.ellipsis) {
         text-overflow: ellipsis;
         overflow: hidden;
