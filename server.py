@@ -298,7 +298,7 @@ def api_full_playlist(platform: str):
     else:
         print_green('Successfully inserted many into Track')
 
-    playlist_tracks_coll.insertmany(playlist_tracks_to_insert)
+    res = playlist_tracks_coll.insertmany(playlist_tracks_to_insert)
     if not res.ok:
         print_red(
             f'Error inserting many into PlaylistTracks (PlaylistID = {playlist_id}): {res}')
