@@ -75,23 +75,26 @@ def api_playlist_info(platform: str):
     if playlist_info is None:
         return {'error': f'Playlist with Playlist ID {playlist_id} not found'}, 404
 
-    colls['Playlist'].delete({
-        'Platform': platform,
-        'PlaylistID': playlist_id,
-    })
-
-    colls['Playlist'].insert({
-        'PlaylistID': playlist_info['playlist_id'],
-        'Title': playlist_info['title'],
-        'Owner': playlist_info['owner'],
-        'Description': playlist_info['description'],
-        'Thumbnail': playlist_info['thumbnail'],
-        'Length': playlist_info['length'],
-        'Etag': playlist_info['etag'],
-        'Platform': platform,
-    })
-
-    print_blue(f'Inserted {playlist_id} into Playlist cache')
+    res = colls['Playlist'].update(
+        {
+            'Platform': platform,
+            'PlaylistID': playlist_id,
+        },
+        {
+            'PlaylistID': playlist_info['playlist_id'],
+            'Title': playlist_info['title'],
+            'Owner': playlist_info['owner'],
+            'Description': playlist_info['description'],
+            'Thumbnail': playlist_info['thumbnail'],
+            'Length': playlist_info['length'],
+            'Etag': playlist_info['etag'],
+            'Platform': platform,
+        }
+    )
+    if res.ok:
+        print_blue(f'Inserted {playlist_id} into Playlist cache')
+    else:
+        print_red(f'Failed to insert {playlist_id} into Playlist cache: {res.err()}')
 
     return playlist_info, 200
 

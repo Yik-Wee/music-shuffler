@@ -159,6 +159,20 @@ class Collection:
     def find(self, record: Union[dict, str]) -> Result:
         raise NotImplementedError()
 
+    def update(self, old_record: Union[dict, str], new_record: dict) -> Result:
+        '''
+        Update the all rows matching `old_record` to the `new_record`.
+
+        Params
+        ------
+        `old_record`
+        - The old record to update. If set to `"*"`, update all records in the table.
+
+        `new_record`
+        - The new record with the updated values
+        '''
+        raise NotImplementedError()
+
 
 class PlaylistCollection(Collection):
     '''
@@ -257,6 +271,81 @@ class PlaylistCollection(Collection):
             SELECT * FROM Playlist
             WHERE PlaylistID = ? AND Platform = ?;
         ''', (playlist_id, platform), commit=False, cursor_callback=lambda cur: cur.fetchall())
+        return result
+
+    def update(self, old_record: Union[dict, str], new_record: dict) -> Result:
+        '''
+        Update the all rows matching `old_record` to the `new_record`.
+
+        Params
+        ------
+        `old_record`
+        - The old record to update. If set to `"*"`, update all records in the table.
+          Required fields are:
+          - `PlaylistID`
+          - `Platform`
+
+        `new_record`
+        - The new record with the updated values. Required fields are:
+          - `PlaylistID`
+          - `Title`
+          - `Owner`
+          - `Description`
+          - `Thumbnail`
+          - `Length`
+          - `Etag`
+          - `Platform`
+        '''
+
+        # validate record
+        validation_result = self.validate(new_record)
+        if not validation_result.ok:
+            return validation_result
+
+        if old_record == '*':
+            self.try_execute(
+                '''
+                UPDATE Playlist
+                SET
+                    PlaylistID = :PlaylistID,
+                    Title = :Title,
+                    Owner = :Owner,
+                    Description = :Description,
+                    Thumbnail = :Thumbnail,
+                    Length = :Length,
+                    Etag = :Etag,
+                    Platform = :Platform;
+                ''',
+                new_record,
+            )
+
+        old_playlist_id = old_record.get('PlaylistID')
+        old_platform = old_record.get('Platform')
+        if old_playlist_id is None or old_platform is None:
+            return Err('Invalid filter (old_record). Both PlaylistID and Platform columns are required')
+
+        result = self.try_execute(
+            '''
+            UPDATE Playlist
+            SET
+                PlaylistID = :PlaylistID,
+                Title = :Title,
+                Owner = :Owner,
+                Description = :Description,
+                Thumbnail = :Thumbnail,
+                Length = :Length,
+                Etag = :Etag,
+                Platform = :Platform
+            WHERE
+                PlaylistID = :OldPlaylistID AND
+                Platform = :OldPlatform;
+            ''',
+            {
+                **new_record,
+                'OldPlaylistID': old_playlist_id,
+                'OldPlatform': old_platform,
+            }
+        )
         return result
 
 
@@ -370,6 +459,9 @@ class TrackCollection(Collection):
             WHERE TrackID = ? AND Platform = ?;
         ''', (track_id, platform), commit=False, cursor_callback=lambda cur: cur.fetchall())
         return result
+
+    def update(self, old_record: Union[dict, str], new_record: dict) -> Result:
+        return super().update(old_record, new_record)
 
 
 class PlaylistTracksCollection(Collection):
@@ -518,3 +610,6 @@ class PlaylistTracksCollection(Collection):
             ORDER BY Position ASC;
         ''', (playlist_id, platform), commit=False, cursor_callback=lambda cur: cur.fetchall())
         return result
+
+    def update(self, old_record: Union[dict, str], new_record: dict) -> Result:
+        return super().update(old_record, new_record)
