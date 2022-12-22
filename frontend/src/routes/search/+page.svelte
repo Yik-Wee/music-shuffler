@@ -75,7 +75,7 @@
     let height: number = 240;
 </script>
 
-<div>
+<div class="search-results">
     <h1>{platform}</h1>
     {#if id}
         {#if err}
@@ -97,3 +97,11 @@
         />
     {/if}
 </div>
+
+<style>
+    .search-results {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+</style>

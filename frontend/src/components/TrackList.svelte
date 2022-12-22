@@ -16,13 +16,13 @@
 
 <div class="tracklist-wrapper">
     <TrackListSearch {tracklist} {trackclick} bind:isSearching={isSearching} />
-    <div class="tracklist-headers track-layout">
+    <div class="tracklist-headers track-layout" class:hidden={isSearching}>
         <div>#</div>
         <div>🖼️</div>
         <div>Title/Owner</div>
         <div>🕒</div>
     </div>
-    <div class="tracklist" hidden={isSearching}>
+    <div class="tracklist" class:hidden={isSearching}>
         {#each tracklist as track, position}
             <LazyTrack
                 {...track}
@@ -59,5 +59,9 @@
         height: var(--height);
         overflow-x: hidden;
         overflow-y: auto;
+    }
+
+    .hidden {
+        display: none;
     }
 </style>

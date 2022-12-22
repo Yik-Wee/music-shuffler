@@ -57,14 +57,16 @@
         <div data-playlist-id={playlist.playlist_id} class="playlist-renderer">
             <h2>{playlist.owner}</h2>
             <h2>{playlist.title}</h2>
-            <div>
-                <p class="playlist-description" class:ellipsis={hideDesc}>{playlist.description}</p>
-                {#if hideDesc}
-                    <button on:click={() => hideDesc = false}>Show More</button>
-                {:else}
-                    <button on:click={() => hideDesc = true}>Show Less</button>
-                {/if}
-            </div>
+            {#if playlist.description}
+                <div>
+                    <p class="playlist-description" class:ellipsis={hideDesc}>{playlist.description}</p>
+                    {#if hideDesc}
+                        <button on:click={() => hideDesc = false}>Show More</button>
+                    {:else}
+                        <button on:click={() => hideDesc = true}>Show Less</button>
+                    {/if}
+                </div>
+            {/if}
             <img
                 src={playlist.thumbnail}
                 alt="{playlist.owner} - {playlist.title}"
@@ -94,12 +96,18 @@
             ifempty="Playlist is empty"
             trackclick={setQueueIfQueueDiff}
         />
+    {:else if !err}
+        <p>Fetching tracks... This may take a while</p>
     {/if}
 </div>
 
 <style>
     .playlist-description {
         white-space: pre-wrap;
+    }
+
+    .playlist-thumbnail {
+        max-height: 100px;
     }
 
     .ellipsis {

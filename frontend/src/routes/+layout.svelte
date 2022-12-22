@@ -135,7 +135,7 @@
             position: fixed;
             top: 0;
             z-index: 9;
-            transition: opacity 75ms ease-in-out;
+            transition: opacity 175ms ease-in-out;
             display: flex;
             flex-direction: row;
             column-gap: 4px;
@@ -158,7 +158,4 @@
             height: calc(100vh - (7vh + 8px + 4px));
         }
     }
-
-    /* .player-controls > * {
-    } */
 </style>

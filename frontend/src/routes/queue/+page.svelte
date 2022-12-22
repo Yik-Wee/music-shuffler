@@ -8,7 +8,6 @@
 <div>
     <button
         on:click={() => {
-            console.log('clicked');
             TrackQueue.shuffle();
             tracklist = TrackQueue.tracklist();
             console.log(tracklist.map(({ title }) => title));

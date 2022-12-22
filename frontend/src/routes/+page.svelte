@@ -1,7 +1,7 @@
-<script lang="ts">
+<!-- <script lang="ts">
+    // TESTING CODE
     import TrackList from "../components/TrackList.svelte";
     import { TrackQueue } from "../stores";
-
 
     TrackQueue.setQueue(
         [
@@ -34,7 +34,7 @@
     )
 </script>
 
-<TrackList tracklist={TrackQueue.tracklist()} />
+<TrackList tracklist={TrackQueue.tracklist()} /> -->
 
 <h1>Music Shuffler</h1>
 <pre>♪ ( ´˘`) -ᴗ-) ´˘`) -ᴗ-) ♫</pre>

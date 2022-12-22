@@ -32,41 +32,46 @@
 </script>
 
 <div class="tracklist-search">
-    <input
-        type="text"
-        placeholder="Search track by title/artist"
-        bind:value={searched}
-        on:input={() => {
-            if (!searched.trim()) {
-                isSearching = false;
-            }
-        }}
-        on:change={() => {
-            searchedFrozen = searched.trim();
-            if (!searchedFrozen) {
-                isSearching = false;
-                return;
-            }
-            isSearching = true;
-            trackIndices = findTrack(searchedFrozen);
-        }}
-        on:keydown={({ key }) => {
-            if (key === 'Enter') {
-                search.click();
-            }
-        }}
-    />
-    <button bind:this={search}>Search</button>
-    <button
-        on:click={() => {
-            isSearching = false;
-            trackIndices = [];
-            searched = '';
-            searchedFrozen = '';
-        }}
-    >
-        x
-    </button>
+    <div class="tracklist-search-bar">
+        <input
+            type="text"
+            placeholder="Search track by title/artist"
+            bind:value={searched}
+            on:input={() => {
+                if (!searched.trim()) {
+                    isSearching = false;
+                }
+            }}
+            on:change={() => {
+                searchedFrozen = searched.trim();
+                if (!searchedFrozen) {
+                    isSearching = false;
+                    return;
+                }
+                isSearching = true;
+                trackIndices = findTrack(searchedFrozen);
+            }}
+            on:keydown={({ key }) => {
+                if (key === 'Enter') {
+                    search.click();
+                }
+            }}
+        />
+        {#if isSearching}
+            <button
+                on:click={() => {
+                    isSearching = false;
+                    trackIndices = [];
+                    searched = '';
+                    searchedFrozen = '';
+                }}
+            >
+                x
+            </button>
+        {:else}
+            <button bind:this={search}>Search</button>
+        {/if}
+    </div>
 
     {#if isSearching}
         <div class="tracklist-headers track-layout">
@@ -95,3 +100,16 @@
         {/each}
     {/if}
 </div>
+
+<style>
+    .tracklist-search-bar {
+        display: flex;
+        flex-direction: row;
+        column-gap: 0.5rem;
+        width: 100%;
+    }
+
+    input {
+        width: 100%;
+    }
+</style>
