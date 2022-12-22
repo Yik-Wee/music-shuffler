@@ -46,14 +46,14 @@
 
 <style>
     .search-bar {
-        margin-top: 10vh;
         display: flex;
         flex-direction: row;
         column-gap: 0.5rem;
+        width: 100%;
     }
 
     .search-bar > input {
-        width: 50%;
+        width: 100%;
     }
 
     .search-bar.error > input:focus,

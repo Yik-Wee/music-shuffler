@@ -1,24 +1,4 @@
-<script lang="ts">
-    import { onMount } from 'svelte';
-
-    let hidden = false;
-    let prevYOffset = 0;
-
-    onMount(() => {
-        window.addEventListener('scroll', () => {
-            // make the navbar disappear
-            let yOffset = window.pageYOffset;
-            if (prevYOffset > yOffset) {
-                hidden = false
-            } else {
-                hidden = true;
-            }
-            prevYOffset = yOffset;
-        });
-    });
-</script>
-
-<div class="navbar" class:hidden={hidden}>
+<div class="navbar">
     <div class="navbar-item">
         <a href="/queue">
             <div class="navbar-icon">
@@ -44,12 +24,6 @@
         display: flex;
         flex-direction: row;
         transition: opacity 100ms ease-in-out;
-        position: fixed;
-        top: 0;
-    }
-
-    .navbar.hidden {
-        opacity: 0;
     }
 
     .navbar-item {

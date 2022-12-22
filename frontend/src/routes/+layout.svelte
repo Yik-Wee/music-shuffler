@@ -14,23 +14,40 @@
         TrackQueue.hideAll();
     }
 
+    let hidden = false;
+    let prevYOffset = 0;
+
     onMount(() => {
         hiddenContainer.remove();
+        window.addEventListener('scroll', () => {
+            // make the navbar disappear
+            let yOffset = window.pageYOffset;
+            if (prevYOffset > yOffset) {
+                hidden = false
+            } else {
+                hidden = true;
+            }
+            prevYOffset = yOffset;
+        });
     });
 </script>
 
 <main>
-    <NavBar />
-    <SearchBar />
-    <Player on:load={onPlayerLoad} />
-    <div class="player-controls">
-        <button class="prev" on:click={() => TrackQueue.loadPrev()}>Prev</button>
-        <button class="toggle" on:click={() => TrackQueue.toggle()}>Play/Pause</button>
-        <button class="next" on:click={() => TrackQueue.loadNext()}>Next</button>
+    <div class="top-bar" class:hidden>
+        <NavBar />
+        <SearchBar />
     </div>
-    {#if loaded}
-        <slot />
-    {/if}
+    <div id="content">
+        <Player on:load={onPlayerLoad} />
+        <div class="player-controls">
+            <button class="prev" on:click={() => TrackQueue.loadPrev()}>Prev</button>
+            <button class="toggle" on:click={() => TrackQueue.toggle()}>Play/Pause</button>
+            <button class="next" on:click={() => TrackQueue.loadNext()}>Next</button>
+        </div>
+        {#if loaded}
+            <slot />
+        {/if}
+    </div>
 </main>
 <div hidden bind:this={hiddenContainer}>
     <a href="/playlist/youtube">Search YouTube Playlist</a>
@@ -50,6 +67,10 @@
         font-size: 13px;
     }
 
+    :global(body) {
+        margin: 0;
+    }
+
     :global(input) {
         outline: 0;
         border: 0;
@@ -61,10 +82,51 @@
         border-bottom: 2px solid blue;
     }
 
+    :global(button) {
+        border: 1.5px solid lightblue;
+        border-radius: 3px;
+        padding: 0.25em 1em;
+        background: none;
+        transition: all 100ms ease-in-out;
+    }
+
+    :global(button:hover) {
+        cursor: pointer;
+        border-color: blue;
+        background: rgb(255, 234, 237);
+    }
+
     :global(.ellipsis) {
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
+    }
+
+    /* @media screen and (min-width: 768px) {
+        .top-bar {
+            display: flex;
+            flex-direction: row;
+        }
+    } */
+
+    .top-bar {
+        height: 10vh;
+        width: 100%;
+        position: fixed;
+        top: 0;
+        z-index: 9;
+        transition: opacity 75ms ease-in-out;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .top-bar.hidden {
+        opacity: 0;
+    }
+
+    #content {
+        margin-top: 10vh;
     }
 
     .player-controls > * {
