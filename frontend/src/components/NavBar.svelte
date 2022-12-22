@@ -1,5 +1,14 @@
 <div class="navbar">
     <div class="navbar-item">
+        <a href="/">
+            <div>
+                <img src="/assets/home.svg" alt="Home">
+            </div>
+            <div class="text">Home</div>
+        </a>
+    </div>
+
+    <div class="navbar-item">
         <a href="/queue">
             <div class="navbar-icon">
                 <img src="/assets/queue.svg" alt="Queue" />

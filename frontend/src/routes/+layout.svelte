@@ -56,6 +56,11 @@
 </div>
 
 <style>
+    :global(body) {
+        margin: 0;
+        text-align: center;
+    }
+
     @font-face {
         font-family: 'Varela';
         src: url('/fonts/VarelaRound/VarelaRound-Regular.ttf');
@@ -64,12 +69,7 @@
     :root,
     :global(input, textarea, button, option, select) {
         font-family: 'Varela';
-        font-size: 13px;
-    }
-
-    :global(body) {
-        margin: 0;
-        text-align: center;
+        font-size: 16px;
     }
 
     :global(input) {
@@ -153,6 +153,7 @@
     @media screen and (max-width: 768px) {
         #content {
             margin-top: calc(7vh + 8px + 4px);
+            height: calc(100vh - (7vh + 8px + 4px));
         }
     }
 
