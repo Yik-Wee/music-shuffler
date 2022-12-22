@@ -23,3 +23,19 @@
     <SpotifyPlayer id="{containerId('spotify')}" on:load={onLoad} />
     <YouTubePlayer id="{containerId('youtube')}" on:load={onLoad} />
 </div>
+
+<style>
+    #players {
+        height: 125px;
+        padding: 5px;
+        margin: 5px;
+        text-align: center;
+        border: 2px solid blue;
+        /* background-image: linear-gradient(to top, #fdcbf1 0%, #fdcbf1 1%, #e6dee9 100%); */
+        background-image: linear-gradient(to top, lightpink 0%, lightpink 1%, rgb(255, 233, 236) 100%);
+    }
+
+    :global(#players > *) {
+        height: inherit;
+    }
+</style>

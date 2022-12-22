@@ -36,12 +36,10 @@
         title="SoundCloud Player"
         id={iframeId}
         width="100%"
-        height="166"
+        height="100%"
         scrolling="no"
         frameborder="no"
         allow="autoplay"
         src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/"
     />
 </div>
-<!-- src="https://w.soundcloud.com/player/?url=https://soundcloud.com/uyn_yn/school-acoustic-ver" -->
-<!-- src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/293&amp;" -->

@@ -6,17 +6,13 @@
         type YouTubePlayer,
         type YouTubePlayerEvent
     } from '../../types/YouTubePlayer';
-    import { createEventDispatcher, onMount, setContext } from 'svelte';
+    import { createEventDispatcher, onMount } from 'svelte';
     import { setPlayer, TrackQueue } from '../../stores';
 
     export let id: string | undefined = undefined;
 
     let player: YouTubePlayer;
     let playerId: string = 'youtube-player';
-
-    // setContext('youtube', {
-    //     getPlayer: () => player,
-    // });
 
     let dispatch = createEventDispatcher();
 
@@ -44,13 +40,9 @@
             }
 
             player = new (window as any).YT.Player(playerId, {
-                height: '130',
-                width: '290',
-                // videoId: 'gdZLi9oWNZg', // haha bts lol funny hehee ahaha
+                height: '100%',
+                width: '100%',
                 videoId: '',
-                // playerVars: {
-                //     playsinline: 1
-                // },
                 events: {
                     onReady: onPlayerReady,
                     onStateChange: onPlayerStateChange
@@ -78,7 +70,6 @@
 </script>
 
 <div {id}>
-    <!-- <script src="https://www.youtube.com/iframe_api" async></script> -->
     <div id="yt-iframe-api-container" />
     <div id="{playerId}" />
 </div>

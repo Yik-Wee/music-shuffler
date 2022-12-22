@@ -69,7 +69,7 @@
     :root,
     :global(input, textarea, button, option, select) {
         font-family: 'Varela';
-        font-size: 16px;
+        font-size: 13px;
     }
 
     :global(input) {

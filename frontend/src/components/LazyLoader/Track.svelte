@@ -88,6 +88,7 @@
         display: grid;
         grid-template-columns: 20px 40px 4fr minmax(0, 1fr);
         align-items: center;
+        text-align: left;
     }
 
     .track {
