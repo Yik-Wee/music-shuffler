@@ -5,11 +5,10 @@
   - User accounts? Secure login system?
 
 ## Frontend
+- [ ] Cache the queue
 - [ ] Add styling to frontend
 - [ ] Reorganise & clean up code
-- [ ] Prevent re-rendering of alr rendered images on shuffle
 - [ ] **?** Deal with unavailable youtube videos e.g. countdown, skip in 5s or something
-- [ ] **?** Add settings
 
 # TODO Maybe
 - [ ] Use 206 partial response with flask API routes, using `yield` and `generator(), ...`
