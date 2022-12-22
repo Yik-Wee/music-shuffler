@@ -4,7 +4,7 @@
             <div class="navbar-icon">
                 <img src="/assets/queue.svg" alt="Queue" />
             </div>
-            <div>Queue</div>
+            <div class="text">Queue</div>
         </a>
     </div>
 
@@ -13,7 +13,7 @@
             <div>
                 <img src="/assets/library.svg" alt="Library" />
             </div>
-            <div>Library</div>
+            <div class="text">Library</div>
         </a>
     </div>
 </div>
@@ -23,28 +23,49 @@
         height: 10vh;
         display: flex;
         flex-direction: row;
-        transition: opacity 100ms ease-in-out;
+        background-color: inherit;
     }
 
     .navbar-item {
-        background-color: lightgreen;
+        background-color: inherit;
         padding: 4px;
         text-align: center;
         height: calc(10vh - 8px);
-        width: calc(10vh - 8px);
+        flex: 1 100%;
         transition: background-color 75ms ease-in-out;
     }
 
     .navbar-item:hover {
-        background-color: green;
+        background-color: rgb(255, 210, 218);
+        border-radius: 2px;
     }
 
     a {
         text-decoration: none;
         height: 5vh;
+        color: black;
     }
 
     img {
         height: 5vh;
+    }
+
+    /* mobile - navbar at bottom */
+    @media screen and (max-width: 768px) {
+        .navbar {
+            height: 7vh;
+            width: 100%;
+            bottom: 0;
+            position: fixed;
+        }
+
+        .text {
+            display: none;
+        }
+
+        .navbar-item {
+            height: calc(7vh - 8px);
+            width: calc(7vh - 8px);
+        }
     }
 </style>

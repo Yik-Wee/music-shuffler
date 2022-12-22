@@ -69,6 +69,7 @@
 
     :global(body) {
         margin: 0;
+        text-align: center;
     }
 
     :global(input) {
@@ -93,7 +94,7 @@
     :global(button:hover) {
         cursor: pointer;
         border-color: blue;
-        background: rgb(255, 234, 237);
+        background: rgb(240, 240, 255);
     }
 
     :global(.ellipsis) {
@@ -102,34 +103,59 @@
         white-space: nowrap;
     }
 
-    /* @media screen and (min-width: 768px) {
-        .top-bar {
-            display: flex;
-            flex-direction: row;
-        }
-    } */
+    :global(::-webkit-scrollbar) {
+        width: 14px;
+    }
+
+    :global(::-webkit-scrollbar-track) {
+        background-color: transparent;
+    }
+
+    :global(::-webkit-scrollbar-thumb) {
+        background-color: #d6dee1;
+        border-radius: 14px;
+        border: 3px solid transparent;
+        background-clip: content-box;
+    }
+    
+    :global(::-webkit-scrollbar-thumb:hover) {
+        background-color: #a8bbbf;
+    }
 
     .top-bar {
-        height: 10vh;
-        width: 100%;
-        position: fixed;
-        top: 0;
-        z-index: 9;
-        transition: opacity 75ms ease-in-out;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
+        background-color: rgb(255, 233, 236);
     }
 
-    .top-bar.hidden {
-        opacity: 0;
+    @media screen and (min-width: 768px) {
+        .top-bar {
+            height: 10vh;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            z-index: 9;
+            transition: opacity 75ms ease-in-out;
+            display: flex;
+            flex-direction: row;
+            column-gap: 4px;
+            padding: 4px;
+            align-items: center;
+        }
+    
+        .top-bar.hidden {
+            opacity: 0;
+        }
+    
+        #content {
+            margin-top: calc(10vh + 8px + 4px);
+        }
     }
 
-    #content {
-        margin-top: 10vh;
+    @media screen and (max-width: 768px) {
+        #content {
+            margin-top: calc(7vh + 8px + 4px);
+        }
     }
 
-    .player-controls > * {
-        /* ... */
-    }
+    /* .player-controls > * {
+    } */
 </style>
