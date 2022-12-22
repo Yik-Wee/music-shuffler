@@ -32,6 +32,9 @@
 
     onMount(async () => {
         id = $page.url.searchParams.get('id') || '';
+        if (!id) {
+            return;
+        }
 
         // request data from API endpoint for specified platform
         let res = await getPlaylist(data.platform, id);
@@ -44,15 +47,6 @@
 </script>
 
 <div>
-    <h1>{data.platform}</h1>
-    {#if id}
-        {#if err}
-            <div>{err}</div>
-        {/if}
-    {:else}
-        <div>Search for a {data.platform} playlist with it's playlist ID!</div>
-    {/if}
-
     {#if playlist}
         <div data-playlist-id={playlist.playlist_id} class="playlist-renderer">
             <h2>{playlist.owner}</h2>
@@ -96,7 +90,12 @@
             ifempty="Playlist is empty"
             trackclick={setQueueIfQueueDiff}
         />
-    {:else if !err}
+    {:else if err}
+        <h2>An error occurred :/</h2>
+        <p>{err}</p>
+    {:else if !id}
+        <p>Search for a {data.platform} playlist with it's playlist ID!</p>
+    {:else}
         <p>Fetching tracks... This may take a while</p>
     {/if}
 </div>

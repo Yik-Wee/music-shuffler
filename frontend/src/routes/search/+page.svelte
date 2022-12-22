@@ -76,17 +76,7 @@
 </script>
 
 <div class="search-results">
-    <h1>{platform}</h1>
-    {#if id}
-        {#if err}
-            <div>{err}</div>
-        {/if}
-
-        <div>(Debug) PlaylistID: {id}</div>
-    {:else}
-        <div>Search for a {platform} playlist with it's playlist ID!</div>
-    {/if}
-
+    <h1>Results for {platform} playlist "{id}"</h1>
     {#if playlistInfo}
         <PlaylistCard
             {...playlistInfo}
@@ -95,6 +85,8 @@
             --thumbnail-height="{0.6 * height}px"
             on:click={() => goto(`/playlist/${platform}?id=${id}`)}
         />
+    {:else if err}
+        <p>{err}</p>
     {/if}
 </div>
 

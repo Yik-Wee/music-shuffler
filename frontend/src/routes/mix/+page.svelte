@@ -62,16 +62,6 @@
 </script>
 
 <div>
-    {#if title}
-        {#if err}
-            <div>{err}</div>
-        {:else}
-            <h2>{title}</h2>
-        {/if}
-    {:else}
-        <div>Play a Mix in your library!</div>
-    {/if}
-
     {#if mix}
         <div data-mix-title={mix.title} class="playlist-renderer">
             <img src="/assets/jammies.gif" alt="Mix - {mix.title}" class="playlist-thumbnail" />
@@ -85,5 +75,10 @@
         >
 
         <TrackList tracklist={mix.tracks} ifempty="Mix is empty" trackclick={setQueueIfQueueDiff} />
+    {:else if err}
+        <h2>An error occurred :/</h2>
+        <p>{err}</p>
+    {:else if !title}
+        <p>You can find or create a mix from your <a href="/library">library</a>!</p>
     {/if}
 </div>
