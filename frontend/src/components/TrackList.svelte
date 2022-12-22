@@ -14,34 +14,50 @@
     let isSearching = false;
 </script>
 
-<TrackListSearch {tracklist} {trackclick} bind:isSearching={isSearching} />
-<div class="tracklist" hidden={isSearching}>
+<div class="tracklist-wrapper">
+    <TrackListSearch {tracklist} {trackclick} bind:isSearching={isSearching} />
     <div class="tracklist-headers track-layout">
         <div>#</div>
         <div>🖼️</div>
         <div>Title/Owner</div>
         <div>🕒</div>
     </div>
-
-    {#each tracklist as track, position}
-        <LazyTrack
-            {...track}
-            {position}
-            on:click={() => {
-                if (trackclick) {
-                    trackclick();
-                }
-                TrackQueue.load(position);
-                TrackQueue.play();
-            }}
-        />
-    {:else}
-        <p>{ifempty}</p>
-    {/each}
+    <div class="tracklist" hidden={isSearching}>
+        {#each tracklist as track, position}
+            <LazyTrack
+                {...track}
+                {position}
+                on:click={() => {
+                    if (trackclick) {
+                        trackclick();
+                    }
+                    TrackQueue.load(position);
+                    TrackQueue.play();
+                }}
+            />
+        {:else}
+            <p>{ifempty}</p>
+        {/each}
+    </div>
 </div>
 
 <style>
     :global(.tracklist-headers) {
         background-color: lightpink;
+    }
+
+    :root {
+        --height: auto;
+        --padding: 4px;
+    }
+
+    .tracklist-wrapper {
+        padding: var(--padding);
+    }
+
+    .tracklist {
+        height: var(--height);
+        overflow-x: hidden;
+        overflow-y: auto;
     }
 </style>

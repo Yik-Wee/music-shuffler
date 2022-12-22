@@ -2,7 +2,7 @@
     import SearchBar from '../components/SearchBar.svelte';
     import Player from '../components/Player.svelte';
     import NavBar from '../components/NavBar.svelte';
-    import { supportedPlatforms, TrackQueue } from '../stores';
+    import { TrackQueue } from '../stores';
     import { onMount } from 'svelte';
 
     let loaded = false;
@@ -44,9 +44,11 @@
             <button class="toggle" on:click={() => TrackQueue.toggle()}>Play/Pause</button>
             <button class="next" on:click={() => TrackQueue.loadNext()}>Next</button>
         </div>
-        {#if loaded}
-            <slot />
-        {/if}
+        <div>
+            {#if loaded}
+                <slot />
+            {/if}
+        </div>
     </div>
 </main>
 <div hidden bind:this={hiddenContainer}>

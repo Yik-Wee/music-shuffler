@@ -31,7 +31,7 @@
         margin: 5px;
         text-align: center;
         border: 2px solid blue;
-        /* background-image: linear-gradient(to top, #fdcbf1 0%, #fdcbf1 1%, #e6dee9 100%); */
+        border-radius: 4px;
         background-image: linear-gradient(to top, lightpink 0%, lightpink 1%, rgb(255, 233, 236) 100%);
     }
 
