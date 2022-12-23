@@ -1,6 +1,6 @@
 <script lang="ts">
     import { TrackQueue } from '../../stores';
-    import TrackList from '../../components/TrackList.svelte';
+    import TrackList from '../../components/Tracks/TrackList.svelte';
 
     let tracklist = TrackQueue.tracklist();
 </script>

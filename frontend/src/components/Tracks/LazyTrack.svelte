@@ -1,6 +1,6 @@
 <script lang="ts">
     import Track from "./Track.svelte";
-    import IntersectionObserver from "./IntersectionObserver.svelte";
+    import IntersectionObserver from "../LazyLoader/IntersectionObserver.svelte";
 
     export let track_id: string;
     export let platform: string;

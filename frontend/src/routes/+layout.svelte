@@ -1,6 +1,6 @@
 <script lang="ts">
     import SearchBar from '../components/SearchBar.svelte';
-    import Player from '../components/Player.svelte';
+    import Player from '../components/Player/Player.svelte';
     import NavBar from '../components/NavBar.svelte';
     import { TrackQueue } from '../stores';
     import { onMount } from 'svelte';

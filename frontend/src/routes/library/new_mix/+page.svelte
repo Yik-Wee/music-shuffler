@@ -1,6 +1,6 @@
 <script lang="ts">
     import { getSaved, getSavedMixes, save, type Library, type SavedMixInfo } from '../../../library';
-    import LibraryItem from '../../../components/LibraryItem.svelte';
+    import LibraryItem from '../../../components/PlaylistCard.svelte';
     import SelectableLibraryItem from '../SelectableLibraryItem.svelte';
     import { goto } from '$app/navigation';
     import { onMount } from 'svelte';

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Highlighter from './Highlighter.svelte';
+    import Highlighter from '../Highlighter.svelte';
 
     export let track_id: string;
     export let platform: string;

@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { getSaved, type Library } from '../../library';
-    import LibraryItem from '../../components/LibraryItem.svelte';
+    import LibraryItem from '../../components/PlaylistCard.svelte';
     import { goto } from '$app/navigation';
 
     let library: Library = {

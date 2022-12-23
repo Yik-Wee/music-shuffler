@@ -1,8 +1,8 @@
 <!-- used to render a track list -->
 <script lang="ts">
-    import { TrackQueue } from '../stores';
-    import type { Track as TrackType } from '../types/PlaylistTracks';
-    import LazyTrack from './LazyLoader/LazyTrack.svelte';
+    import { TrackQueue } from '../../stores';
+    import type { Track as TrackType } from '../../types/PlaylistTracks';
+    import LazyTrack from './LazyTrack.svelte';
     import TrackListSearch from './TrackListSearch.svelte';
 
     export let tracklist: TrackType[];

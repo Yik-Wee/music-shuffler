@@ -1,7 +1,7 @@
 <script lang="ts">
-    import Track from './LazyLoader/Track.svelte';
-    import type { Track as TrackType } from '../types/PlaylistTracks';
-    import { TrackQueue } from '../stores';
+    import Track from './Track.svelte';
+    import type { Track as TrackType } from '../../types/PlaylistTracks';
+    import { TrackQueue } from '../../stores';
 
     export let tracklist: TrackType[];
 

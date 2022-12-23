@@ -5,7 +5,7 @@
     import { isErrorResponse, type PlaylistResponse } from '../../../types/PlaylistTracks';
     import { getPlaylist } from '../../../requests';
     import { TrackQueue } from '../../../stores';
-    import TrackList from '../../../components/TrackList.svelte';
+    import TrackList from '../../../components/Tracks/TrackList.svelte';
     import { savePlaylist } from '../../../library';
 
     export let data: PageData;
