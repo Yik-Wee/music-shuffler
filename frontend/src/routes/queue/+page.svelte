@@ -3,6 +3,13 @@
     import TrackList from '../../components/Tracks/TrackList.svelte';
 
     let tracklist = TrackQueue.tracklist();
+    let loading = TrackQueue.isQueueLoading;
+
+    loading.subscribe((value) => {
+        if (value === false) {
+            tracklist = TrackQueue.tracklist();
+        }
+    })
 </script>
 
 <div>
@@ -12,5 +19,9 @@
             tracklist = TrackQueue.tracklist();
         }}>Shuffle</button
     >
-    <TrackList {tracklist} ifempty="Queue is empty" />
+    {#if $loading}
+        <TrackList {tracklist} ifempty="Loading..." />
+    {:else}
+        <TrackList {tracklist} ifempty="Queue is empty" />
+    {/if}
 </div>

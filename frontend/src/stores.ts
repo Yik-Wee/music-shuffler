@@ -1,4 +1,7 @@
-import type { PlaylistInfoResponse, Track } from './types/PlaylistTracks';
+import { writable, type Writable } from 'svelte/store';
+import { findSavedMix } from './library';
+import { getPlaylist } from './requests';
+import { isErrorResponse, type PlaylistResponse, type Track } from './types/PlaylistTracks';
 import { type SoundCloudPlayer, scGet } from './types/SoundCloudPlayer';
 import type SpotifyPlayer from './types/SpotifyPlayer';
 import { YouTubePlayerState, type YouTubePlayer } from './types/YouTubePlayer';
@@ -39,7 +42,6 @@ namespace TrackQueue {
     type Queue = {
         position: number;
         tracklist: Track[];
-        // playlists: PlaylistInfoResponse[];
         id: string;
         platform: string;
     };
@@ -47,10 +49,105 @@ namespace TrackQueue {
     let queue: Queue = {
         position: 0,
         tracklist: [],
-        // playlists: []
         id: '',
         platform: ''
     };
+
+    export let isQueueLoading: Writable<boolean> = writable(false);
+
+    function isString(value: any): value is string {
+        return typeof value === 'string' || value instanceof String;
+    }
+
+    /**
+     * Get the cached queue.
+     * @returns {Promise<Queue>} The queue that was cached, or a default empty queue
+     * no queue was cached or the cache was not found.
+     */
+    async function getCachedQueue(): Promise<Queue> {
+        let raw = localStorage.getItem('queue');
+        if (!raw) {
+            console.log('No cached queue found');
+            return queue;
+        }
+
+        let withoutTracks: any;
+        try {
+            withoutTracks = JSON.parse(raw);
+        } catch {
+            console.log('Unable to parse cached queue');
+            return queue;
+        }
+
+        let { id, platform, position } = withoutTracks;
+        if (!(isString(id) && isString(platform) && Number.isInteger(position))) {
+            console.log('Invalid cached queue types')
+            return queue;
+        }
+
+        id = id.trim();
+        // is not mix, just regular playlist
+        if (supportedPlatforms.includes(platform.toLowerCase())) {
+            let playlist = await getPlaylist(platform, id);
+            if (isErrorResponse(playlist)) {
+                console.log('Error fetching cached queue', playlist.error);
+                return queue;
+            }
+
+            console.log('cached queue was playlist. success');
+            return {
+                position,
+                id,
+                platform,
+                tracklist: playlist.tracks
+            };
+        }
+
+        if (platform.toLowerCase() !== 'mix') {
+            console.log('cached queue invalid platform', platform);
+            return queue;
+        }
+
+        // is mix. get mix tracks
+        let savedMixInfo = findSavedMix(id);
+
+        if (!savedMixInfo) {
+            console.log('no cached queue mix with title', id);
+            return queue;
+        }
+
+        let responses = await Promise.all(
+            savedMixInfo.playlists.map(({ platform, id }) =>
+                getPlaylist(platform.toLowerCase(), id)
+            )
+        );
+
+        let tracklist: Track[] = [];
+
+        tracklist = responses
+            .filter((res): res is PlaylistResponse => {
+                let isErr = isErrorResponse(res);
+                if (isErr) {
+                    console.error('Response error:', res);
+                }
+                return !isErr;
+            })
+            .map((playlist) => playlist.tracks)
+            .reduce((flat, toFlatten) => flat.concat(toFlatten));
+
+        console.log('cached queue was mix. success');
+
+        return { position, tracklist, id, platform };
+    }
+
+    /**
+     * Loads the most recently cached queue
+     */
+    export async function loadCachedQueue() {
+        isQueueLoading.set(true);
+        queue = await getCachedQueue();
+        isQueueLoading.set(false);
+    }
 
     /**
      * Set/reset the queue to store the `tracklist` and `playlists` the tracks are from.
@@ -64,7 +161,15 @@ namespace TrackQueue {
         queue.position = 0;
         queue.id = id;
         queue.platform = platform;
+        load(0);
         play();
+
+        // cache the queue so it remains the same on reload
+        localStorage.setItem('queue', JSON.stringify({
+            position: 0,
+            id,
+            platform,
+        }));
     }
 
     /**

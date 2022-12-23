@@ -13,8 +13,9 @@
         TrackQueue.hideAll();
     }
 
-    onMount(() => {
+    onMount(async () => {
         prerenderedServerSideRoutes.remove();
+        await TrackQueue.loadCachedQueue();
     });
 </script>
 
