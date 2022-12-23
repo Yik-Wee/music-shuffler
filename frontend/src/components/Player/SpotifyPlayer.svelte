@@ -35,9 +35,9 @@
     <iframe
         id={iframeId}
         title="Spotify Player"
-        height="100%"
-        width="100%"
         frameborder="0"
         src="https://open.spotify.com/embed/track/"
     />
 </div>
+
+<style src="./players.css"></style>

@@ -2,6 +2,7 @@
     import Track from './Track.svelte';
     import type { Track as TrackType } from '../../types/PlaylistTracks';
     import { TrackQueue } from '../../stores';
+    import TrackListHeaders from './TrackListHeaders.svelte';
 
     export let tracklist: TrackType[];
 
@@ -74,13 +75,7 @@
     </div>
 
     {#if isSearching}
-        <div class="tracklist-headers track-layout">
-            <div>#</div>
-            <div>🖼️</div>
-            <div>Title/Owner</div>
-            <div>🕒</div>
-        </div>
-
+        <TrackListHeaders />
         {#each trackIndices as position}
             <Track
                 {...tracklist[position]}

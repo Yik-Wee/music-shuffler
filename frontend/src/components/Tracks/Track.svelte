@@ -78,18 +78,7 @@
 </div>
 
 <style>
-    :global(.track-layout) {
-        border: 1px solid transparent;
-        border-radius: 4px;
-        height: 60px;
-        position: relative;
-        column-gap: 8px;
-        padding: 0 16px;
-        display: grid;
-        grid-template-columns: 20px 40px 4fr minmax(0, 1fr);
-        align-items: center;
-        text-align: left;
-    }
+    @import './track-layout.css';
 
     .track {
         background-color: whitesmoke;

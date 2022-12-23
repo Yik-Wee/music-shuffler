@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { parse, type ParsedUrl } from '../url';
+    import { parse, type ParsedUrl } from '../../url';
 
     let searchButton: HTMLAnchorElement;
 

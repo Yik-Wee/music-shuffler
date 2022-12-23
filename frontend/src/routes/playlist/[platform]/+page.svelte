@@ -7,13 +7,12 @@
     import { TrackQueue } from '../../../stores';
     import TrackList from '../../../components/Tracks/TrackList.svelte';
     import { savePlaylist } from '../../../library';
+    import PlaylistDescription from './PlaylistDescription.svelte';
 
     export let data: PageData;
     let id: string;
     let err: string | undefined;
     let playlist: PlaylistResponse | undefined;
-
-    let hideDesc: boolean = true;
 
     function setQueueIfQueueDiff() {
         if (
@@ -51,16 +50,7 @@
         <div data-playlist-id={playlist.playlist_id} class="playlist-renderer">
             <h2>{playlist.owner}</h2>
             <h2>{playlist.title}</h2>
-            {#if playlist.description}
-                <div>
-                    <p class="playlist-description" class:ellipsis={hideDesc}>{playlist.description}</p>
-                    {#if hideDesc}
-                        <button on:click={() => hideDesc = false}>Show More</button>
-                    {:else}
-                        <button on:click={() => hideDesc = true}>Show Less</button>
-                    {/if}
-                </div>
-            {/if}
+            <PlaylistDescription description={playlist.description} />
             <img
                 src={playlist.thumbnail}
                 alt="{playlist.owner} - {playlist.title}"
@@ -101,17 +91,7 @@
 </div>
 
 <style>
-    .playlist-description {
-        white-space: pre-wrap;
-    }
-
     .playlist-thumbnail {
         max-height: 100px;
-    }
-
-    .ellipsis {
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        overflow: hidden;
     }
 </style>

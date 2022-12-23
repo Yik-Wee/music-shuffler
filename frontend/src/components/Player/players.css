@@ -1,0 +1,4 @@
+div, iframe {
+    height: inherit;
+    width: 100%;
+}

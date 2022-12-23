@@ -1,5 +1,4 @@
 <!-- https://developers.google.com/youtube/iframe_api_reference -->
-
 <script lang="ts">
     import {
         YouTubePlayerState,
@@ -40,8 +39,6 @@
             }
 
             player = new (window as any).YT.Player(playerId, {
-                height: '100%',
-                width: '100%',
                 videoId: '',
                 events: {
                     onReady: onPlayerReady,
@@ -70,6 +67,13 @@
 </script>
 
 <div {id}>
-    <div id="yt-iframe-api-container" />
-    <div id="{playerId}" />
+    <div id="yt-iframe-api-container" hidden />
+    <iframe
+        title="YouTube Player"
+        frameborder="0"
+        id={playerId}
+        src="https://www.youtube.com/embed/?enablejsapi=1"
+    />
 </div>
+
+<style src="./players.css"></style>

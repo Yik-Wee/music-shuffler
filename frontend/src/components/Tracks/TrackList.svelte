@@ -3,6 +3,7 @@
     import { TrackQueue } from '../../stores';
     import type { Track as TrackType } from '../../types/PlaylistTracks';
     import LazyTrack from './LazyTrack.svelte';
+    import TrackListHeaders from './TrackListHeaders.svelte';
     import TrackListSearch from './TrackListSearch.svelte';
 
     export let tracklist: TrackType[];
@@ -16,12 +17,7 @@
 
 <div class="tracklist-wrapper">
     <TrackListSearch {tracklist} {trackclick} bind:isSearching={isSearching} />
-    <div class="tracklist-headers track-layout" class:hidden={isSearching}>
-        <div>#</div>
-        <div>🖼️</div>
-        <div>Title/Owner</div>
-        <div>🕒</div>
-    </div>
+    <TrackListHeaders hidden={isSearching} />
     <div class="tracklist" class:hidden={isSearching}>
         {#each tracklist as track, position}
             <LazyTrack
@@ -42,10 +38,6 @@
 </div>
 
 <style>
-    :global(.tracklist-headers) {
-        background-color: lightpink;
-    }
-
     :root {
         --height: auto;
     }
