@@ -66,6 +66,7 @@ namespace TrackQueue {
      */
     async function getCachedQueue(): Promise<Queue> {
         let raw = localStorage.getItem('queue');
+
         if (!raw) {
             console.log('No cached queue found');
             return queue;
@@ -79,9 +80,28 @@ namespace TrackQueue {
             return queue;
         }
 
-        let { id, platform, position } = withoutTracks;
-        if (!(isString(id) && isString(platform) && Number.isInteger(position))) {
-            console.log('Invalid cached queue types')
+        let { id, platform } = withoutTracks;
+        let position = 0;
+        let trackRaw = localStorage.getItem('last-played');
+        let track = null;
+        let trackId = '';
+        let trackPlatform = '';
+
+        if (trackRaw) {
+            try {
+                track = JSON.parse(trackRaw);
+                trackId = track.track_id || '';
+                trackPlatform = track.platform.toLowerCase() || '';
+            } catch (err) {
+                console.error(err);
+                localStorage.removeItem('last-played');
+            }
+        }
+
+        console.log(track, trackId, trackPlatform);
+
+        if (!(isString(id) && isString(platform))) {
+            console.log('Invalid cached queue types');
             return queue;
         }
 
@@ -92,6 +112,16 @@ namespace TrackQueue {
             if (isErrorResponse(playlist)) {
                 console.log('Error fetching cached queue', playlist.error);
                 return queue;
+            }
+
+            if (track) {
+                position = playlist.tracks.findIndex(
+                    (track) => track.track_id === trackId && track.platform === trackPlatform
+                );
+                if (position === -1) {
+                    position = 0;
+                }
+                console.log('last played track at position', position);
             }
 
             console.log('cached queue was playlist. success');
@@ -135,6 +165,16 @@ namespace TrackQueue {
             .map((playlist) => playlist.tracks)
             .reduce((flat, toFlatten) => flat.concat(toFlatten));
 
+        if (track) {
+            position = tracklist.findIndex(
+                (track) => track.track_id === trackId && track.platform.toLowerCase() === trackPlatform
+            );
+            if (position === -1) {
+                position = 0;
+            }
+            console.log('last played track at position', position);
+        }
+
         console.log('cached queue was mix. success');
 
         return { position, tracklist, id, platform };
@@ -147,6 +187,7 @@ namespace TrackQueue {
         isQueueLoading.set(true);
         queue = await getCachedQueue();
         isQueueLoading.set(false);
+        load(queue.position);
     }
 
     /**
@@ -165,11 +206,7 @@ namespace TrackQueue {
         play();
 
         // cache the queue so it remains the same on reload
-        localStorage.setItem('queue', JSON.stringify({
-            position: 0,
-            id,
-            platform,
-        }));
+        localStorage.setItem('queue', JSON.stringify({ id, platform }));
     }
 
     /**
@@ -268,6 +305,9 @@ namespace TrackQueue {
                 return false;
         }
         swap(platform);
+
+        localStorage.setItem('last-played', JSON.stringify(track));
+
         return true;
     }
 
