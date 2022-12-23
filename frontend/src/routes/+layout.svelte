@@ -20,13 +20,9 @@
     onMount(() => {
         hiddenContainer.remove();
         window.addEventListener('scroll', () => {
-            // make the navbar disappear
             let yOffset = window.pageYOffset;
-            if (prevYOffset > yOffset) {
-                hidden = false
-            } else {
-                hidden = true;
-            }
+            // hide when navbar scrolled down
+            hidden = prevYOffset <= yOffset;
             prevYOffset = yOffset;
         });
     });

@@ -10,7 +10,6 @@
         on:click={() => {
             TrackQueue.shuffle();
             tracklist = TrackQueue.tracklist();
-            console.log(tracklist.map(({ title }) => title));
         }}>Shuffle</button
     >
     <TrackList {tracklist} ifempty="Queue is empty" />

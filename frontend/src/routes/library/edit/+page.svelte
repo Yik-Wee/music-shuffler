@@ -47,9 +47,6 @@
 
 <a href="/library">
     <button on:click={() => {
-        console.log(selectedPlaylists);
-        console.log(selectedMixTitles);
-
         selectedPlaylists.forEach(pl => deleteSavedPlaylist(pl));
         selectedMixTitles.forEach(title => deleteSavedMix(title));
     }}>Done</button>

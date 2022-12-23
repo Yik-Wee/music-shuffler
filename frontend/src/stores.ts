@@ -64,6 +64,7 @@ namespace TrackQueue {
         queue.position = 0;
         queue.id = id;
         queue.platform = platform;
+        play();
     }
 
     /**

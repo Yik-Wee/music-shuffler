@@ -1,12 +1,9 @@
 <script lang="ts">
     import { parse, type ParsedUrl } from '../url';
 
-    let search: HTMLAnchorElement;
-    let url: string = '';
-    let parsedUrl: ParsedUrl | null = null;
-    let href: string = getHref();
+    let searchButton: HTMLAnchorElement;
 
-    function getHref(): string {
+    function getHref(parsedUrl: ParsedUrl | null): string {
         if (parsedUrl === null) {
             return 'javascript:void(0)';
         }
@@ -16,6 +13,10 @@
         let encodedDomain = encodeURIComponent(parsedUrl.domain);
         return `/search?platform=${platform}&id=${encodedId}&domain=${encodedDomain}`;
     }
+
+    let url: string = '';
+    $: parsedUrl = parse(url.trim());
+    $: href = getHref(parsedUrl);
 </script>
 
 <div class="search-bar" class:error={parsedUrl === null}>
@@ -24,23 +25,15 @@
         name="id"
         placeholder="Playlist URL"
         bind:value={url}
-        on:input={() => {
-            url = url.trim();
-            parsedUrl = parse(url);
-            href = getHref();
-
-            console.log({ parsedUrl });
-            console.log({ href });
-        }}
         on:keydown={({ key }) => {
             if (key === 'Enter') {
-                search.click();
+                searchButton.click();
             }
         }}
     />
 
     <div class="search-button-container">
-        <a class="search-button" {href} bind:this={search}>👌</a>
+        <a class="search-button" {href} bind:this={searchButton}>👌</a>
     </div>
 </div>
 
