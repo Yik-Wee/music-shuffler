@@ -116,14 +116,14 @@ namespace TrackQueue {
 
             if (track) {
                 position = playlist.tracks.findIndex(
-                    (track) => track.track_id === trackId && track.platform === trackPlatform
+                    (track) => track.track_id === trackId && track.platform.toLowerCase() === trackPlatform
                 );
                 if (position === -1) {
                     position = 0;
                 }
                 console.log('last played track at position', position);
             }
-
+    
             console.log('cached queue was playlist. success');
             return {
                 position,
