@@ -4,6 +4,8 @@
     import SelectableLibraryItem from '../SelectableLibraryItem.svelte';
     import { goto } from '$app/navigation';
     import { onMount } from 'svelte';
+    import { getPlaylistInfo } from 'src/requests';
+    import { isErrorResponse, type PlaylistInfoResponse, type ErrorResponse } from 'src/types/PlaylistTracks';
 
     let newMix: SavedMixInfo = {
         title: '', // must be unique
@@ -14,6 +16,8 @@
         mixes: [],
         playlists: [],
     };
+
+    let mixTrackCount = 0;
 
     onMount(async () => {
         library = await getSaved();
@@ -48,6 +52,8 @@
                 platform: playlistInfo.platform,
                 id: playlistInfo.playlist_id,
             }}
+            onselect={() => mixTrackCount += playlistInfo.length}
+            onunselect={() => mixTrackCount -= playlistInfo.length}
             {...playlistInfo}
         />
     {/each}
@@ -86,6 +92,11 @@
 
             if (!validateMixLength(newMix)) {
                 newMixError = 'Mix must include more than 1 playlist';
+                return;
+            }
+
+            if (mixTrackCount > 50000) {
+                newMixError = 'Mix must have ≤50000 tracks';
                 return;
             }
 

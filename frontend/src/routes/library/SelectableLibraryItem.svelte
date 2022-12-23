@@ -16,6 +16,9 @@ Renders the `PlaylistCard` that can be selected and unselected on click.
     /** The current item that will be added or removed from the `selectedlist` on click */
     export let item: T;
 
+    export let onselect: (() => void) | undefined = undefined;
+    export let onunselect: (() => void) | undefined = undefined;
+
     /** The colour of the card when selected */
     export let colorSelected: string = 'greenyellow';
 
@@ -41,11 +44,13 @@ Renders the `PlaylistCard` that can be selected and unselected on click.
                 // unselect the item - remove the item from the selectedlist with its index
                 selectedlist.splice(idx, 1);
                 isSelected = false;
+                if (onunselect) onunselect();
             } else {
                 // select the item - push to selectedlist
                 selectedlist.push(item);
                 idx = selectedlist.length - 1;
                 isSelected = true;
+                if (onselect) onselect();
             }
         }}
     />
