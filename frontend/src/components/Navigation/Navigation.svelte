@@ -24,6 +24,7 @@
 <style>
     .top-bar {
         background-color: rgb(255, 233, 236);
+        z-index: 9;
     }
 
     @media screen and (min-width: 768px) {
@@ -32,7 +33,6 @@
             width: 100%;
             position: fixed;
             top: 0;
-            z-index: 9;
             transition: opacity 175ms ease-in-out;
             display: flex;
             flex-direction: row;
