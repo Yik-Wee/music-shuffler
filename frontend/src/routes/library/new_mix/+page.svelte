@@ -4,8 +4,6 @@
     import SelectableLibraryItem from '../SelectableLibraryItem.svelte';
     import { goto } from '$app/navigation';
     import { onMount } from 'svelte';
-    import { getPlaylistInfo } from 'src/requests';
-    import { isErrorResponse, type PlaylistInfoResponse, type ErrorResponse } from 'src/types/PlaylistTracks';
 
     let newMix: SavedMixInfo = {
         title: '', // must be unique
@@ -34,13 +32,24 @@
         return idx === -1;
     }
 
-    function validateMixLength(mix: SavedMixInfo): boolean {
-        // must have more than 1 playlist
-        return mix.playlists.length > 1;
+    function validateMix(mix: SavedMixInfo, mixTrackCount: number): [boolean, string] {
+        if (!validateTitle(mix.title)) {
+            return [false, 'Invalid title. Title must be unique'];
+        }
+
+        if (mix.playlists.length === 0) {
+            return [false, 'Mix must have >1 playlist'];
+        }
+
+        if (mixTrackCount > 50000) {
+            return [false, 'Mix must have ≤50000 tracks'];
+        }
+
+        return [true, ''];
     }
 
-    let isValidTitle = false;
-    let newMixError = '';
+    $: isValidTitle = validateTitle(newMix.title);
+    $: [isValidMix, errorMsg] = validateMix(newMix, mixTrackCount);
 </script>
 
 <h1>Saved Playlists</h1>
@@ -74,44 +83,25 @@
             class:error={!isValidTitle}
             type="text"
             bind:value={newMix.title}
-            on:input={() => {
-                isValidTitle = validateTitle(newMix.title);
-                if (!isValidTitle) {
-                    newMixError = 'Mix title must be unique';
-                }
-            }}
         />
     </LibraryItem>
 
     <button
+        disabled={!isValidMix}
         on:click={() => {
-            if (!isValidTitle) {
-                newMixError = 'Mix title must be unique';
-                return;
-            }
-
-            if (!validateMixLength(newMix)) {
-                newMixError = 'Mix must include more than 1 playlist';
-                return;
-            }
-
-            if (mixTrackCount > 50000) {
-                newMixError = 'Mix must have ≤50000 tracks';
+            if (!isValidMix) {
                 return;
             }
 
             newMix.title = newMix.title.trim();
             library.mixes.push(newMix);
             save(newMix);
-
-            console.log('Saved mix:', newMix);
-
             goto('/library');
         }}
     >
         Done
         <div class="mix-error-message">
-            <b>{newMixError}</b>
+            <b>{errorMsg}</b>
         </div>
     </button>
     <a href="/library">

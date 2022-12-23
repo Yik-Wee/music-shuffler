@@ -44,7 +44,7 @@
             <button class="toggle" on:click={() => TrackQueue.toggle()}>Play/Pause</button>
             <button class="next" on:click={() => TrackQueue.loadNext()}>Next</button>
         </div>
-        <div>
+        <div class="padding-small">
             {#if loaded}
                 <slot />
             {/if}
@@ -126,6 +126,10 @@
 
     .top-bar {
         background-color: rgb(255, 233, 236);
+    }
+
+    .padding-small {
+        padding: 4px;
     }
 
     @media screen and (min-width: 768px) {

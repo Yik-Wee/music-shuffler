@@ -48,11 +48,6 @@
 
     :root {
         --height: auto;
-        --padding: 4px;
-    }
-
-    .tracklist-wrapper {
-        padding: var(--padding);
     }
 
     .tracklist {

@@ -47,7 +47,7 @@ Renders the library item as a card (playlist or mix)
         --width: 120px;
         --height: 220px;
         --lines: 3;
-        --thumbnail-width: auto;
+        --thumbnail-width: 90%;
         --thumbnail-height: calc(0.4 * var(--height));
         --bg-colour: whitesmoke;
         --bg-colour-hover: salmon;
@@ -91,6 +91,8 @@ Renders the library item as a card (playlist or mix)
     .playlist-card > .playlist-card-thumbnail {
         display: flex;
         justify-content: center;
+        align-items: center;
+        height: var(--thumbnail-height);
     }
 
     .playlist-card > .playlist-card-thumbnail > img {
