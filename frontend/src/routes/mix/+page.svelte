@@ -1,12 +1,8 @@
 <script type="ts">
     import { page } from '$app/stores';
     import { onMount } from 'svelte';
-    import {
-        isErrorResponse,
-        toPlaylistInfo,
-        type PlaylistResponse
-    } from '../../types/PlaylistTracks';
-    import { getPlaylist } from '../../requests';
+    import { toPlaylistInfo } from '../../types/PlaylistTracks';
+    import { getManyPlaylists } from '../../requests';
     import { TrackQueue } from '../../stores';
     import TrackList from '../../components/Tracks/TrackList.svelte';
     import { findSavedMix, type SavedMix } from '../../library';
@@ -36,24 +32,8 @@
             return;
         }
 
-        let responses = await Promise.all(
-            savedMixInfo.playlists.map(({ platform, id }) => getPlaylist(platform.toLowerCase(), id))
-        );
-
-        mix = {
-            title,
-            playlists: [],
-            tracks: []
-        };
-
-        responses
-            .filter((res): res is PlaylistResponse => {
-                let isErr = !isErrorResponse(res);
-                if (isErr) {
-                    console.error('Response error:', res);
-                }
-                return isErr;
-            })
+        let playlistResponses = await getManyPlaylists(savedMixInfo.playlists);
+        playlistResponses
             .forEach((playlist) => {
                 mix?.playlists.push(toPlaylistInfo(playlist));
                 mix?.tracks.push(...playlist.tracks);

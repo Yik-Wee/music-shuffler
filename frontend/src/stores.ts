@@ -1,6 +1,6 @@
 import { writable, type Writable } from 'svelte/store';
 import { findSavedMix } from './library';
-import { getPlaylist } from './requests';
+import { getManyPlaylists, getPlaylist } from './requests';
 import { isErrorResponse, type PlaylistResponse, type Track } from './types/PlaylistTracks';
 import { type SoundCloudPlayer, scGet } from './types/SoundCloudPlayer';
 import type SpotifyPlayer from './types/SpotifyPlayer';
@@ -35,17 +35,150 @@ function containerId(player: string): string {
     return `${idPart}-player-container`;
 }
 
+type Queue = {
+    position: number;
+    tracklist: Track[];
+    id: string;
+    platform: string;
+};
+
 /**
- * The namespace containing functions to control the track queue
+ * manages `TrackQueue` cache e.g. queue and last played track
  */
-namespace TrackQueue {
-    type Queue = {
-        position: number;
-        tracklist: Track[];
+namespace CacheManager {
+    const KEYS = {
+        queue: 'cached-queue',
+        track: 'last-played-track'
+    };
+
+    type CacheIdentifier = {
         id: string;
         platform: string;
     };
 
+    function parseJson<T>(
+        jsonString: string,
+        validate: ((value: any) => value is T) | undefined = undefined
+    ): T | null {
+        try {
+            let parsed = JSON.parse(jsonString);
+            if (!validate) {
+                return parsed;
+            }
+            return validate(parsed) ? parsed : null;
+        } catch {
+            return null;
+        }
+    }
+
+    function getCache<T>(
+        key: string,
+        validate: ((value: any) => value is T) | undefined = undefined
+    ): T | null {
+        let str = localStorage.getItem(key);
+        if (!str) {
+            return null;
+        }
+
+        return parseJson<T>(str, validate);
+    }
+
+    function isString(value: any): value is string {
+        return typeof value === 'string' || value instanceof String;
+    }
+
+    function isCacheIdentifier(obj: any): obj is CacheIdentifier {
+        return isString(obj.id) && isString(obj.platform);
+    }
+
+    function validatePlatform(platform: string): boolean {
+        return [...supportedPlatforms, 'mix'].includes(platform);
+    }
+
+    export function setCachedQueue(queue: CacheIdentifier) {
+        let { id, platform } = queue;
+        localStorage.setItem(KEYS.queue, JSON.stringify({ id, platform }));
+    }
+
+    export async function getCachedQueue(): Promise<Queue | null> {
+        let cachedQueueInfo = getCache<CacheIdentifier>(
+            KEYS.queue,
+            (value): value is CacheIdentifier => {
+                return isCacheIdentifier(value) && validatePlatform(value.platform);
+            }
+        );
+
+        if (!cachedQueueInfo) {
+            return null;
+        }
+
+        let { platform, id } = cachedQueueInfo;
+        let position = 0;
+        let cachedTrackInfo = getCachedTrackInfo();
+
+        // is not mix, just regular playlist
+        if (supportedPlatforms.includes(platform.toLowerCase())) {
+            let playlist = await getPlaylist(platform, id);
+            if (isErrorResponse(playlist)) {
+                console.log('Error fetching cached queue', playlist.error);
+                return null;
+            }
+
+            position = getCachedTrackPosition(playlist.tracks, cachedTrackInfo) || 0;
+
+            return {
+                position,
+                id,
+                platform,
+                tracklist: playlist.tracks
+            };
+        }
+
+        // is mix. get mix tracks
+        let savedMixInfo = findSavedMix(id);
+        if (!savedMixInfo) {
+            return null;
+        }
+
+        let playlistResponses = await getManyPlaylists(savedMixInfo.playlists);
+        let tracklist = playlistResponses
+            .map((playlist) => playlist.tracks)
+            .reduce((flat, toFlatten) => flat.concat(toFlatten));
+        position = getCachedTrackPosition(tracklist, cachedTrackInfo) || 0;
+        return { position, tracklist, id, platform };
+    }
+
+    function getCachedTrackPosition(
+        tracklist: Track[],
+        trackInfo: CacheIdentifier | null
+    ): number | null {
+        if (!trackInfo) {
+            return null;
+        }
+
+        let idx = tracklist.findIndex(
+            (track) =>
+                track.track_id === trackInfo.id &&
+                track.platform.toLowerCase() === trackInfo.platform.toLowerCase()
+        );
+        return idx === -1 ? null : idx;
+    }
+
+    export function setCachedTrackInfo(trackInfo: CacheIdentifier) {
+        localStorage.setItem(KEYS.track, JSON.stringify(trackInfo));
+    }
+
+    export function getCachedTrackInfo(): CacheIdentifier | null {
+        return getCache<CacheIdentifier>(KEYS.track, (value): value is CacheIdentifier => {
+            return isCacheIdentifier(value) && validatePlatform(value.platform);
+        });
+    }
+}
+
+/**
+ * The namespace containing functions to control the track queue
+ */
+namespace TrackQueue {
     let queue: Queue = {
         position: 0,
         tracklist: [],
@@ -55,137 +188,15 @@ namespace TrackQueue {
 
     export let isQueueLoading: Writable<boolean> = writable(false);
 
-    function isString(value: any): value is string {
-        return typeof value === 'string' || value instanceof String;
-    }
-
-    /**
-     * Get the cached queue.
-     * @returns {Promise<Queue>} The queue that was cached, or a default empty queue
-     * no queue was cached or the cache was not found.
-     */
-    async function getCachedQueue(): Promise<Queue> {
-        let raw = localStorage.getItem('queue');
-
-        if (!raw) {
-            console.log('No cached queue found');
-            return queue;
-        }
-
-        let withoutTracks: any;
-        try {
-            withoutTracks = JSON.parse(raw);
-        } catch {
-            console.log('Unable to parse cached queue');
-            return queue;
-        }
-
-        let { id, platform } = withoutTracks;
-        let position = 0;
-        let trackRaw = localStorage.getItem('last-played');
-        let track = null;
-        let trackId = '';
-        let trackPlatform = '';
-
-        if (trackRaw) {
-            try {
-                track = JSON.parse(trackRaw);
-                trackId = track.track_id || '';
-                trackPlatform = track.platform.toLowerCase() || '';
-            } catch (err) {
-                console.error(err);
-                localStorage.removeItem('last-played');
-            }
-        }
-
-        console.log(track, trackId, trackPlatform);
-
-        if (!(isString(id) && isString(platform))) {
-            console.log('Invalid cached queue types');
-            return queue;
-        }
-
-        id = id.trim();
-        // is not mix, just regular playlist
-        if (supportedPlatforms.includes(platform.toLowerCase())) {
-            let playlist = await getPlaylist(platform, id);
-            if (isErrorResponse(playlist)) {
-                console.log('Error fetching cached queue', playlist.error);
-                return queue;
-            }
-
-            if (track) {
-                position = playlist.tracks.findIndex(
-                    (track) => track.track_id === trackId && track.platform.toLowerCase() === trackPlatform
-                );
-                if (position === -1) {
-                    position = 0;
-                }
-                console.log('last played track at position', position);
-            }
-    
-            console.log('cached queue was playlist. success');
-            return {
-                position,
-                id,
-                platform,
-                tracklist: playlist.tracks
-            };
-        }
-
-        if (platform.toLowerCase() !== 'mix') {
-            console.log('cached queue invalid platform', platform);
-            return queue;
-        }
-
-        // is mix. get mix tracks
-        let savedMixInfo = findSavedMix(id);
-
-        if (!savedMixInfo) {
-            console.log('no cached queue mix with title', id);
-            return queue;
-        }
-
-        let responses = await Promise.all(
-            savedMixInfo.playlists.map(({ platform, id }) =>
-                getPlaylist(platform.toLowerCase(), id)
-            )
-        );
-
-        let tracklist: Track[] = [];
-
-        tracklist = responses
-            .filter((res): res is PlaylistResponse => {
-                let isErr = isErrorResponse(res);
-                if (isErr) {
-                    console.error('Response error:', res);
-                }
-                return !isErr;
-            })
-            .map((playlist) => playlist.tracks)
-            .reduce((flat, toFlatten) => flat.concat(toFlatten));
-
-        if (track) {
-            position = tracklist.findIndex(
-                (track) => track.track_id === trackId && track.platform.toLowerCase() === trackPlatform
-            );
-            if (position === -1) {
-                position = 0;
-            }
-            console.log('last played track at position', position);
-        }
-
-        console.log('cached queue was mix. success');
-
-        return { position, tracklist, id, platform };
-    }
-
     /**
      * Loads the most recently cached queue
      */
     export async function loadCachedQueue() {
         isQueueLoading.set(true);
-        queue = await getCachedQueue();
+        let cachedQueue = await CacheManager.getCachedQueue();
+        if (cachedQueue) {
+            queue = cachedQueue;
+        }
         isQueueLoading.set(false);
         load(queue.position);
     }
@@ -205,8 +216,7 @@ namespace TrackQueue {
         load(0);
         play();
 
-        // cache the queue so it remains the same on reload
-        localStorage.setItem('queue', JSON.stringify({ id, platform }));
+        CacheManager.setCachedQueue({ id, platform });
     }
 
     /**
@@ -306,8 +316,7 @@ namespace TrackQueue {
         }
         swap(platform);
 
-        localStorage.setItem('last-played', JSON.stringify(track));
-
+        CacheManager.setCachedTrackInfo({ id: track.track_id, platform: track.platform });
         return true;
     }
 
