@@ -36,17 +36,17 @@
     }
 
     .navbar-item {
-        background-color: inherit;
+        background-color: var(--radical-red);
         padding: 4px;
         text-align: center;
         height: calc(10vh - 8px);
         flex: 1 100%;
         transition: background-color 75ms ease-in-out;
     }
-
+    
     .navbar-item:hover {
-        background-color: rgb(255, 210, 218);
-        border-radius: 2px;
+        /* background-color: rgb(255, 210, 218); */
+        background-color: var(--radical-red-dim);
     }
 
     a {

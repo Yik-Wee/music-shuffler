@@ -1,17 +1,46 @@
-body {
-    margin: 0;
-    text-align: center;
-}
-
 @font-face {
     font-family: 'Varela';
     src: url('/fonts/VarelaRound/VarelaRound-Regular.ttf');
 }
 
+:root {
+    /* --khaki-web: #b7ad99; */
+    --green: #226f2c;
+    --orange: #ffa34c;
+    --red-translucent: #b72a448c;
+    --radical-red: #ff4365;
+    --radical-red-dim: #ce244f;
+    --black: #030301;
+    --dark-blue: #1c1e29;
+    --mid-blue: #1e2236;
+    --light-blue: #242d5b;
+    --turquoise-dim: #0c8f80;
+    --turquoise-bright: #00ffe1;
+    --turquoise-bright-translucent: #00ffe1a0;
+    --turquoise: #00d9c0;
+    --ivory: #fffff3;
+}
+
+body {
+    margin: 0;
+    text-align: center;
+    background-color: var(--dark-blue);
+}
+
+a {
+    color: var(--radical-red);
+}
+
 :root,
-input, textarea, button, option, select {
+input,
+textarea,
+button,
+option,
+select {
     font-family: 'Varela';
     font-size: 13px;
+    color: white;
+    background-color: inherit;
 }
 
 input {
@@ -21,12 +50,15 @@ input {
     transition: all 200ms ease-in-out;
 }
 
-input:focus, input:hover {
+input:focus,
+input:hover {
     border-bottom: 2px solid blue;
 }
 
 button {
-    border: 1.5px solid lightblue;
+    /* border: 1.5px solid lightblue; */
+    color: var(--ivory);
+    border: 1.5px solid var(--radical-red-dim);
     border-radius: 3px;
     padding: 0.25em 1em;
     background: none;
@@ -35,8 +67,8 @@ button {
 
 button:hover {
     cursor: pointer;
-    border-color: blue;
-    background: rgb(240, 240, 255);
+    border-color: var(--radical-red);
+    background: var(--red-translucent);
 }
 
 .ellipsis {

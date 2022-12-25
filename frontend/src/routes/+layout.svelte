@@ -47,7 +47,11 @@
 
 <style>
     .content {
-        padding: 4px;
+        padding: 8px;
+        width: 90%;
+        /* background-color: var(--mid-blue); */
+        color: var(--ivory);
+        margin: auto;
     }
 
     @media screen and (min-width: 768px) {

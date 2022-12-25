@@ -23,7 +23,9 @@
 
 <style>
     .top-bar {
-        background-color: rgb(255, 233, 236);
+        /* background-color: rgb(255, 233, 236); */
+        background-color: var(--black);
+        color: var(--ivory);
         z-index: 9;
     }
 

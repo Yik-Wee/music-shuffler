@@ -19,3 +19,18 @@
     <a href="https://open.spotify.com">Spotify</a> on this device. Otherwise, only
     a 30 second "preview" of the track can be played.
 </p>
+
+<style>
+    h1, h2 {
+        width: fit-content;
+        margin: auto;
+    }
+
+    h1 {
+        border-bottom: 4px solid var(--green);
+    }
+
+    h2 {
+        border-bottom: 2px solid var(--orange);
+    }
+</style>

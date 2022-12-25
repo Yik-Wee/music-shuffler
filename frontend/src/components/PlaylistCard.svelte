@@ -49,8 +49,8 @@ Renders the library item as a card (playlist or mix)
         --lines: 3;
         --thumbnail-width: 90%;
         --thumbnail-height: calc(0.4 * var(--height));
-        --bg-colour: whitesmoke;
-        --bg-colour-hover: salmon;
+        --bg-colour: var(--mid-blue);
+        --bg-colour-hover: var(--light-blue);
     }
 
     .playlist-card {

@@ -81,12 +81,12 @@
     @import './track-layout.css';
 
     .track {
-        background-color: whitesmoke;
+        background-color: var(--mid-blue);
         cursor: pointer;
         transition: background-color 100ms ease-in;
     }
 
     .track:hover {
-        background-color: lightblue;
+        background-color: var(--light-blue);
     }
 </style>

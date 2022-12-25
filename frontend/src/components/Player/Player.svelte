@@ -31,13 +31,15 @@
         padding: 5px;
         margin: 5px;
         text-align: center;
-        border: 2px solid blue;
+        /* border: 2px solid blue; */
+        border: 2px solid var(--radical-red);
         border-radius: 4px;
-        background-image: linear-gradient(
+        background-color: var(--mid-blue);
+        /* background-image: linear-gradient(
             to top,
             lightpink 0%,
             lightpink 1%,
             rgb(255, 233, 236) 100%
-        );
+        ); */
     }
 </style>

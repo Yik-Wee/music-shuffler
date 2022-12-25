@@ -45,10 +45,12 @@
         width: 100%;
         height: inherit;
         background-color: inherit;
+        color: inherit;
     }
 
     .search-bar > input {
         width: 100%;
+        color: inherit;
         background-color: inherit;
     }
 
@@ -76,13 +78,17 @@
         justify-content: center;
         align-items: center;
         width: 5rem;
-        border: 1.5px solid rgb(255, 199, 208);
+        /* border: 1.5px solid rgb(255, 199, 208); */
+        border: 1.5px solid var(--turquoise);
+        background-color: var(--turquoise-bright-translucent);
         border-radius: 3px;
-        transition: border 100ms ease-in-out;
+        transition: all 100ms ease-in-out;
     }
 
     .search-button:hover {
-        border: 1.5px solid rgb(255, 157, 173);
+        /* border: 1.5px solid rgb(255, 157, 173); */
+        border: 1.5px solid var(--turquoise-dim);
+        background-color: var(--turquoise-bright);
     }
 
     .search-bar.error > .search-button-container > .search-button {

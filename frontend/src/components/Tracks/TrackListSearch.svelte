@@ -88,7 +88,7 @@
                     TrackQueue.play();
                 }}
                 highlight={searchedFrozen}
-                highlightColor="lightgreen"
+                highlightColor="var(--green)"
             />
         {:else}
             <p>No tracks found</p>

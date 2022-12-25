@@ -13,7 +13,7 @@
     @import './track-layout.css';
 
     .tracklist-headers {
-        background-color: lightpink;
+        background-color: var(--radical-red-dim);
     }
 
     .hidden {
