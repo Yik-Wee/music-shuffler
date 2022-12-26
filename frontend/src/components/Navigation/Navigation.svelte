@@ -27,15 +27,15 @@
         background-color: var(--black);
         color: var(--ivory);
         z-index: 9;
+        position: fixed;
     }
 
     @media screen and (min-width: 768px) {
         .top-bar {
             height: 10vh;
             width: 100%;
-            position: fixed;
             top: 0;
-            transition: opacity 175ms ease-in-out;
+            transition: all 175ms ease-in-out;
             display: flex;
             flex-direction: row;
             column-gap: 4px;
@@ -45,6 +45,7 @@
 
         .top-bar.hidden {
             opacity: 0;
+            top: calc(-10vh - (2 * 4px));
         }
     }
 </style>

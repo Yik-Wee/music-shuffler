@@ -7,9 +7,8 @@
   - User saved playlists
     - `UserPlaylists(Username, PlaylistID, Platform)`
   - User cached queue
-    - `Queue(QueueID, Length)`
+    - `Queue(Username, QueueID, Length)`
     - `QueueTracks(QueueID, TrackID, Platform)`
-    - `UserQueue(Username, QueueID)`
 
 ## Frontend
 - [ ] Fix cache queue
