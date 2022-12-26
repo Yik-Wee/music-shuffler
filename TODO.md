@@ -12,6 +12,12 @@
 
 ## Frontend
 - [ ] Fix cache queue
+- [ ] Keyboard shortcuts
+  - Next `N`
+  - Prev `P`
+  - Pause `space`
+  - Focus search bar `/`
+  - Focus search track `F`
 - Deal with unavailable youtube videos e.g. countdown, skip in 5s or something
 
 ## Maybe
