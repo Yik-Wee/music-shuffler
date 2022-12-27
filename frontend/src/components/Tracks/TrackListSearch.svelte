@@ -7,7 +7,7 @@
     export let tracklist: TrackType[];
 
     /** The callback that is called when `Track` is clicked, before the `Track` is loaded */
-    export let trackclick: (() => void) | undefined = undefined;
+    export let trackclick: ((track: TrackType, position: number) => void) | undefined = undefined;
 
     export let isSearching: boolean;
     let searched = '';
@@ -82,7 +82,7 @@
                 {position}
                 on:click={() => {
                     if (trackclick) {
-                        trackclick();
+                        trackclick(tracklist[position], position);
                     }
                     TrackQueue.load(position);
                     TrackQueue.play();

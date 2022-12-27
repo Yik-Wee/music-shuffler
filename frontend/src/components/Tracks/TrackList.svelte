@@ -10,7 +10,7 @@
     /** The message to display if the tracklist is empty */
     export let ifempty: string = 'Tracklist is empty!';
     /** The callback that is called when `Track` is clicked, before the `Track` is loaded */
-    export let trackclick: (() => void) | undefined = undefined;
+    export let trackclick: ((track: TrackType, position: number) => void) | undefined = undefined;
 
     let isSearching = false;
 </script>
@@ -24,8 +24,9 @@
                 {...track}
                 {position}
                 on:click={() => {
+                    TrackQueue.pause();
                     if (trackclick) {
-                        trackclick();
+                        trackclick(track, position);
                     }
                     TrackQueue.load(position);
                     TrackQueue.play();

@@ -10,11 +10,16 @@
     let title: string;
     let err: string | undefined;
     let mix: SavedMix | undefined;
+    let currentPos = 0;
 
-    function setQueueIfQueueDiff() {
-        if (mix && (TrackQueue.platform() !== 'mix' || TrackQueue.id() !== mix.title)) {
-            TrackQueue.setQueue(mix.tracks, mix.title, 'mix');
-        }
+    function setQueue() {
+        if (!mix) return;
+        TrackQueue.setQueue(
+            mix.tracks,
+            mix.title,
+            'mix',
+            currentPos,
+        );
     }
 
     onMount(async () => {
@@ -50,11 +55,18 @@
         <a
             href="/queue"
             on:click={() => {
-                setQueueIfQueueDiff();
+                setQueue();
             }}>Shuffle in queue</a
         >
 
-        <TrackList tracklist={mix.tracks} ifempty="Mix is empty" trackclick={setQueueIfQueueDiff} />
+        <TrackList
+            tracklist={mix.tracks}
+            ifempty="Mix is empty"
+            trackclick={(_track, position) => {
+                currentPos = position;
+                setQueue();
+            }}
+        />
     {:else if err}
         <h2>An error occurred :/</h2>
         <p>{err}</p>

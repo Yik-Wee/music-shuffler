@@ -205,16 +205,28 @@ namespace TrackQueue {
      * Set/reset the queue to store the `tracklist` and `playlists` the tracks are from.
      * @param tracklist The list of tracks stored in the queue
      * @param id The id of the playlist, or unique title of the mix.
-     * @param platform the platform of the playlist, or 'mix' if it is a mix
+     * @param platform the **lowercase** platform of the playlist, or 'mix' if it is a mix
+     * @param position the position of the current track. default `0`
      */
-    export function setQueue(tracklist: Track[], id: string, platform: string) {
-        pause();
+    export function setQueue(
+        tracklist: Track[],
+        id: string,
+        platform: string,
+        position: number | undefined = undefined
+    ) {
+        // check if queue alr set to desired
+        // if (id === queue.id || platform === queue.platform) {
+        //     queue.position = position || 0;
+        //     // play();
+        //     return;
+        // }
+
+        // pause();
         queue.tracklist = tracklist;
-        queue.position = 0;
         queue.id = id;
         queue.platform = platform;
-        load(0);
-        play();
+        queue.position = position || 0;
+        // play();
 
         CacheManager.setCachedQueue({ id, platform });
     }
@@ -427,10 +439,11 @@ namespace TrackQueue {
     }
 
     /**
-     * Swap to the specified player and `show()` it. `hide()`s and `pause()`s all other players
+     * Swap to the specified player and `show()` it. `hide()`s and `pause()`s the current track
      * @param player the name of the player, e.g. `youtube`, `spotify`, `soundcloud`
      */
     export function swap(player: string) {
+        pause();
         show(player);
         Object.keys(players)
             .filter((key) => key !== player)

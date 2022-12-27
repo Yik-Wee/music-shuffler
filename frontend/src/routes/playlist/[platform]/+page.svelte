@@ -13,20 +13,16 @@
     let id: string;
     let err: string | undefined;
     let playlist: PlaylistResponse | undefined;
+    let currentPos: number = 0;
 
-    function setQueueIfQueueDiff() {
-        if (
-            playlist &&
-            (TrackQueue.id() !== playlist.playlist_id ||
-                TrackQueue.platform() !== playlist.platform)
-        ) {
-            // set current playlist to play in queue
-            TrackQueue.setQueue(
-                playlist.tracks,
-                playlist.playlist_id,
-                playlist.platform.toLowerCase()
-            );
-        }
+    function setQueue() {
+        if (!playlist) return;
+        TrackQueue.setQueue(
+            playlist.tracks,
+            playlist.playlist_id,
+            playlist.platform.toLowerCase(),
+            currentPos,
+        );
     }
 
     onMount(async () => {
@@ -70,15 +66,16 @@
 
         <a
             href="/queue"
-            on:click={() => {
-                setQueueIfQueueDiff();
-            }}>Shuffle in queue</a
+            on:click={() => setQueue()}>Shuffle in queue</a
         >
 
         <TrackList
             tracklist={playlist.tracks}
             ifempty="Playlist is empty"
-            trackclick={setQueueIfQueueDiff}
+            trackclick={(_track, position) => {
+                currentPos = position;
+                setQueue();
+            }}
         />
     {:else if err}
         <h2>An error occurred :/</h2>
