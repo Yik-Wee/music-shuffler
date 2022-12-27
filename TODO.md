@@ -11,14 +11,12 @@
     - `QueueTracks(QueueID, TrackID, Platform)`
 
 ## Frontend
-- [ ] Fix cache queue
 - [ ] Keyboard shortcuts
   - Next `N`
   - Prev `P`
   - Pause `space`
   - Focus search bar `/`
   - Focus search track `F`
-- [ ] Fix only track content without highlight will display ellipses
 - Deal with unavailable youtube videos e.g. countdown, skip in 5s or something
 
 ## Maybe
