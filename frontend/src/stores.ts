@@ -66,7 +66,7 @@ namespace CacheManager {
                 return parsed;
             }
             return validate(parsed) ? parsed : null;
-        } catch {
+        } catch (err) {
             return null;
         }
     }
@@ -120,7 +120,6 @@ namespace CacheManager {
         if (supportedPlatforms.includes(platform.toLowerCase())) {
             let playlist = await getPlaylist(platform, id);
             if (isErrorResponse(playlist)) {
-                console.log('Error fetching cached queue', playlist.error);
                 return null;
             }
 
@@ -170,7 +169,7 @@ namespace CacheManager {
 
     export function getCachedTrackInfo(): CacheIdentifier | null {
         return getCache<CacheIdentifier>(KEYS.track, (value): value is CacheIdentifier => {
-            return isCacheIdentifier(value) && validatePlatform(value.platform);
+            return isCacheIdentifier(value) && validatePlatform(value.platform.toLowerCase());
         });
     }
 }
@@ -292,7 +291,6 @@ namespace TrackQueue {
      * @returns {boolean} `true` if loaded successfully, `false` otherwise
      */
     export function load(position: number): boolean {
-        console.log(`load(${position})`, queue);
         if (position >= queue.tracklist.length || position < 0) {
             return false;
         }
@@ -428,12 +426,9 @@ namespace TrackQueue {
      * Toggles between play and pause on the current track
      */
     export async function toggle() {
-        console.log(await isPlaying());
         if (await isPlaying()) {
-            console.log('toggle pause()');
             pause();
         } else {
-            console.log('toggle play()');
             play();
         }
     }
