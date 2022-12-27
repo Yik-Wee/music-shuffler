@@ -325,6 +325,7 @@ namespace TrackQueue {
                 return false;
         }
         swap(platform);
+        play();
 
         CacheManager.setCachedTrackInfo({ id: track.track_id, platform: track.platform });
         return true;
