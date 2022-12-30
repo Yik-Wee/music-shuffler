@@ -37,6 +37,7 @@
         title="Spotify Player"
         frameborder="0"
         src="https://open.spotify.com/embed/track/"
+        allow="encrypted-media"
     />
 </div>
 
