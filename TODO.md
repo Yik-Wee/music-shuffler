@@ -1,4 +1,11 @@
 # TODO
+## General
+- [ ] Add `google drive` (folders) as a platform for music/videos
+- [ ] User accounts in DB, login, etc.
+- [ ] Fix cached `queue`
+- [ ] User accounts - `admin` / non-admin
+  - For admin, `/dashboard` route to read from DB / get NON-SENSITIVE info from DB
+
 ## Backend
 - Ability to make custom playlists (tracks from diff platforms)
   - User accounts? Secure login system?

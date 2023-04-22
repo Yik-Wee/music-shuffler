@@ -38,6 +38,12 @@
         }
 
         let playlistResponses = await getManyPlaylists(savedMixInfo.playlists);
+        mix = {
+            title,
+            playlists: [],
+            tracks: [],
+        }
+
         playlistResponses
             .forEach((playlist) => {
                 mix?.playlists.push(toPlaylistInfo(playlist));
