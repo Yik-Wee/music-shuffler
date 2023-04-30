@@ -7,7 +7,10 @@ INSERT OR IGNORE INTO Platform (PlatformID)
 VALUES
     ('YOUTUBE'),
     ('SOUNDCLOUD'),
-    ('SPOTIFY');
+    ('SPOTIFY'),
+    ('GOOGLE_DRIVE');
+    -- ('USER_MIX'),
+    -- ('CURRENT_QUEUE');
 
 CREATE TABLE IF NOT EXISTS Playlist (
     PlaylistID TEXT,
@@ -42,3 +45,22 @@ CREATE TABLE IF NOT EXISTS PlaylistTracks (
     FOREIGN KEY (PlaylistID, Platform) REFERENCES Playlist(PlaylistID, Platform),
     FOREIGN KEY (TrackID, Platform) REFERENCES Track(TrackID, Platform)
 );
+
+/*
+CREATE TABLE IF NOT EXISTS User (
+    UserID TEXT,  -- unique username
+    Password TEXT,  -- hashed with salt
+    Admin INTEGER
+        -- None = 0
+        -- Create = 1
+        -- Read = 2
+        -- Update = 3
+        -- Delete = 4
+        -- FullAccess = 5
+);
+
+CREATE TABLE IF NOT EXISTS UserPlaylists (
+    UserID TEXT,
+    PlaylistID TEXT
+);
+*/
